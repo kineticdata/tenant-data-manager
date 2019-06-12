@@ -51,7 +51,7 @@ module Kinetic
         "/home/filesDirectory"
       end
 
-      def properties
+      def template_bindings
         {
           "api" => api,
           "server" => server,

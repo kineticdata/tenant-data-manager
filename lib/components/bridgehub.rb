@@ -34,7 +34,7 @@ module Kinetic
         "#{server}/app/api/v1"
       end
 
-      def properties
+      def template_bindings
         {
           "api" => api,
           "server" => server,

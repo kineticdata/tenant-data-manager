@@ -3,7 +3,7 @@ module Kinetic
     class Core
   
       attr_reader :host, :subdomains, :space_slug, :username, :password,
-                  :space_name, :space_users
+                  :space_name
 
       attr_accessor :service_user_username, :service_user_password
 
@@ -17,7 +17,6 @@ module Kinetic
 
         space = options["space"] || {}
         @space_name = space["name"] || @space_slug
-        @space_users = space["users"] || []
 
         @service_user_username = nil
         @service_user_password = nil
@@ -39,15 +38,12 @@ module Kinetic
         "#{server}/app/api/v1"
       end
 
-      def properties
+      def template_bindings
         {
           "api" => api,
           "server" => server,
           "space_slug" => @space_slug,
           "space_name" => @space_name,
-          "space_users" => @space_users,
-          "username" => @username,
-          "password" => @password,
           "service_user_username" => @service_user_username,
           "service_user_password" => @service_user_password
         }

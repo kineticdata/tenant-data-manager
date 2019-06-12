@@ -46,7 +46,7 @@ module Kinetic
         "http://kubectl-pod-api.kd-pod-admin"
       end
 
-      def properties
+      def template_bindings
         {
           "api" => api,
           "api_v2" => api_v2,

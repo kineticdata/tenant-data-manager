@@ -28,11 +28,11 @@ module Kinetic
               Kinetic::Platform.logger.warn "Running #{template.script} in the #{template.name}:#{template.version} repository."
               Kinetic::Platform.logger.warn "  #{template.script_path}"
               script_variables = {
-                "bridgehub" => @bridgehub.properties,
-                "core" => @core.properties,
-                "discussions" => @discussions.properties,
-                "filehub" => @filehub.properties,
-                "task" => @task.properties
+                "bridgehub" => @bridgehub.template_bindings,
+                "core" => @core.template_bindings,
+                "discussions" => @discussions.template_bindings,
+                "filehub" => @filehub.template_bindings,
+                "task" => @task.template_bindings
               }
               system("ruby", template.script_path, script_variables.to_json)
             else

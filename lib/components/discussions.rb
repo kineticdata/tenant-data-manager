@@ -28,7 +28,7 @@ module Kinetic
         end
       end
 
-      def properties
+      def template_bindings
         {
           "api" => api,
           "server" => server,
