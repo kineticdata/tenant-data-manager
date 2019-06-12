@@ -157,7 +157,11 @@ module Kinetic
             if res.status != 200
               Kinetic::Platform.logger.info "POST #{url} - #{res.status}: #{res.message}"
             end
-  
+
+            # update the bridgehub component with the access key info
+            @bridgehub.access_key_id = bridge_access_key_id
+            @bridgehub.access_key_secret = bridge_access_key_secret
+
             # add space bridge with access key using the space api
             Kinetic::Platform.logger.info "Adding the #{@bridgehub.bridge_slug} bridge to the #{@core.space_name} space"
             http = Http.new(service_user_username, service_user_password)
@@ -204,6 +208,10 @@ module Kinetic
               Kinetic::Platform.logger.info "POST #{url} - #{res.status}: #{res.message}"
             end
   
+            # update the filehub component with the access key info
+            @filehub.access_key_id = filestore_access_key_id
+            @filehub.access_key_secret = filestore_access_key_secret
+
             # update space filestore settings with access key using the space api
             Kinetic::Platform.logger.info "Updating the #{@core.space_name} space filestore settings"
             http = Http.new(service_user_username, service_user_password)

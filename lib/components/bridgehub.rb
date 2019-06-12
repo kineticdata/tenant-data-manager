@@ -5,7 +5,8 @@ module Kinetic
       attr_reader :host, :space_slug, :username, :password,
                   :bridge_slug
 
-      attr_accessor :service_user_username, :service_user_password
+      attr_accessor :access_key_id, :access_key_secret,
+                    :service_user_username, :service_user_password
       
       def initialize(options)
         @host = options["host"]
@@ -15,10 +16,10 @@ module Kinetic
         @password = options["password"] || "admin"
         raise StandardError.new "Bridgehub requires a space slug." if @space_slug.nil?
 
-        @bridge_slug = "ce-#{@space_slug}"
+        @bridge_slug = "#{@space_slug}-core"
 
-        @service_user_username = nil
-        @service_user_password = nil
+        @access_key_id, @access_key_secret = nil, nil
+        @service_user_username, @service_user_password = nil, nil
       end
 
       def server
@@ -29,16 +30,25 @@ module Kinetic
         "#{server}/app/manage-api/v1"
       end
 
+      def client_api
+        "#{server}/app/api/v1"
+      end
+
       def properties
         {
           "api" => api,
-          "bridge_slug" => @bridge_slug,
           "server" => server,
           "space_slug" => @space_slug,
           "username" => @username,
           "password" => @password,
-          "service_user_username" => @service_user_username,
-          "service_user_password" => @service_user_password
+          "bridges" => {
+            "kinetic-core" => {
+              "access_key_id" => @access_key_id,
+              "access_key_secret" => @access_key_secret,
+              "bridge_path" => "#{client_api}/bridges/#{@bridge_slug}",
+              "slug" => @bridge_slug
+            }
+          }
         }
       end
 

@@ -4,6 +4,8 @@ module Kinetic
 
       attr_reader :host, :space_slug, :username, :password,
                   :filestore_slug, :adapter_class, :adapter_properties
+
+      attr_accessor :access_key_id, :access_key_secret
       
       def initialize(options)
         @host = options["host"]
@@ -13,7 +15,9 @@ module Kinetic
         @password = options["password"] || "admin"
         raise StandardError.new "Filehub requires a space slug." if @space_slug.nil?
 
-        @filestore_slug = "ce-#{@space_slug}"
+        @filestore_slug = "#{@space_slug}-core"
+
+        @access_key_id, @access_key_secret = nil, nil
 
         adapter = options["adapter"] || {}
         @adapter_class = adapter["class"] || default_adapter["class"]
@@ -50,12 +54,16 @@ module Kinetic
       def properties
         {
           "api" => api,
-          "filestore_slug" => @filestore_slug,
-          "local_directory" => local_directory,
           "server" => server,
           "space_slug" => @space_slug,
-          "username" => @username,
-          "password" => @password
+          "filestores" => {
+            "kinetic-core" => {
+              "access_key_id" => @access_key_id,
+              "access_key_secret" => @access_key_secret,
+              "filestore_path" => "#{server}/filestores/#{@filestore_slug}",
+              "slug" => @filestore_slug
+            }
+          }
         }
       end
 
