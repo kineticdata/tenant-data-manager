@@ -239,7 +239,7 @@ module Kinetic
             "name" => service_user_username,
             "description" => "OAuth client for #{service_user_username}",
             "clientId" => service_user_username,
-            "clientSecret" => Kinetic::Platform::Random.simple(32),
+            "clientSecret" => service_user_password,
             "redirectUri" => "#{@core.server}/#/OAuthCallback"
           }
           url = "#{@core.api}/oauthClients"
