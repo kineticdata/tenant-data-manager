@@ -39,8 +39,6 @@ module Kinetic
           "api" => api,
           "server" => server,
           "space_slug" => @space_slug,
-          "username" => @username,
-          "password" => @password,
           "bridges" => {
             "kinetic-core" => {
               "access_key_id" => @access_key_id,

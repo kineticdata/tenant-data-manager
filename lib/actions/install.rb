@@ -161,22 +161,6 @@ module Kinetic
             # update the bridgehub component with the access key info
             @bridgehub.access_key_id = bridge_access_key_id
             @bridgehub.access_key_secret = bridge_access_key_secret
-
-            # add space bridge with access key using the space api
-            Kinetic::Platform.logger.info "Adding the #{@bridgehub.bridge_slug} bridge to the #{@core.space_name} space"
-            http = Http.new(service_user_username, service_user_password)
-            payload = {
-              "name" => bridge_name,
-              "status" => "Active",
-              "url" => "#{@bridgehub.api}/bridges/#{@bridgehub.bridge_slug}",
-              "key" => bridge_access_key_id,
-              "secret" => bridge_access_key_secret
-            }
-            url = "#{@core.api}/bridges"
-            res = http.post(url, payload, http.default_headers)
-            if res.status != 200
-              Kinetic::Platform.logger.info "PUT #{url} - #{res.status}: #{res.message}"
-            end
           else
             Kinetic::Platform.logger.info "POST #{url} - #{res.status}: #{res.message}"
           end
@@ -211,23 +195,6 @@ module Kinetic
             # update the filehub component with the access key info
             @filehub.access_key_id = filestore_access_key_id
             @filehub.access_key_secret = filestore_access_key_secret
-
-            # update space filestore settings with access key using the space api
-            Kinetic::Platform.logger.info "Updating the #{@core.space_name} space filestore settings"
-            http = Http.new(service_user_username, service_user_password)
-            payload = {
-              "filestore" => {
-                "filehubUrl" => @filehub.server,
-                "key" => filestore_access_key_id,
-                "secret" => filestore_access_key_secret,
-                "slug" => @filehub.filestore_slug
-              }
-            }
-            url = "#{@core.api}/space"
-            res = http.put(url, payload, http.default_headers)
-            if res.status != 200
-              Kinetic::Platform.logger.info "PUT #{url} - #{res.status}: #{res.message}"
-            end
           else
             Kinetic::Platform.logger.info "POST #{url} - #{res.status}: #{res.message}"
           end
