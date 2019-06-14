@@ -3,14 +3,15 @@ module Kinetic
     class Core
   
       attr_reader :host, :subdomains, :space_slug, :username, :password,
-                  :space_name
+                  :space_name, :log_level
 
       attr_accessor :service_user_username, :service_user_password
 
       def initialize(options)
         @host = options["host"]
+        @log_level = options["log_level"]
         @subdomains = options["subdomains"]
-        @space_slug = options["space-slug"]
+        @space_slug = options["space_slug"]
         @username = options["username"] || "admin"
         @password = options["password"] || "admin"
         raise StandardError.new "Core requires a space slug." if @space_slug.nil?
@@ -41,6 +42,7 @@ module Kinetic
       def template_bindings
         {
           "api" => api,
+          "log_level" => @log_level,
           "server" => server,
           "space_slug" => @space_slug,
           "space_name" => @space_name,

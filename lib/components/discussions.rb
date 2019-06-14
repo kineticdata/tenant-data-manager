@@ -3,12 +3,13 @@ module Kinetic
     class Discussions
 
       attr_reader :host, :subdomains, :space_slug,
-                  :oauth_client_id, :oauth_client_secret
+                  :oauth_client_id, :oauth_client_secret, :log_level
       
       def initialize(options)
         @host = options["host"]
         @subdomains = options["subdomains"]
-        @space_slug = options["space-slug"]
+        @log_level = options["log_level"]
+        @space_slug = options["space_slug"]
         raise StandardError.new "Discussions requires a space slug." if @space_slug.nil?
 
         oauth_client = options["oauth-client"] || {}
@@ -31,6 +32,7 @@ module Kinetic
       def template_bindings
         {
           "api" => api,
+          "log_level" => @log_level,
           "server" => server,
           "space_slug" => @space_slug
         }

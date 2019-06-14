@@ -43,20 +43,11 @@ POST /install
     "slug":"my-space",
     "host":"http://my-platform-server.io",
     "subdomains":true,
+    "log_level":"info",
     "components":{
-      "request-ce":{
+      "core":{
         "username":"admin",
-        "password":"SECRET!",
-        "space":{
-          "name":"My Space",
-          "users":[
-            {
-              "username":"integration-user",
-              "email":"DO_NOT_REPLY@my-platform-server.io",
-              "spaceAdmin": true
-            }
-          ]
-        }
+        "password":"SECRET!"
       },
       "bridgehub":{
         "username":"admin",
@@ -68,27 +59,21 @@ POST /install
       },
       "discussions":{
         "username":"admin",
-        "password":"SECRET!",
-        "oauth-client":{
-          "id":"kinetic-bundle",
-          "secret":"SECRET!"
-        }
+        "password":"SECRET!"
       },
       "task":{
-        "image":"kineticdata/task:4.4.0-SNAPSHOT",
         "username":"admin",
         "password":"SECRET!",
-        "db":{
-          "host":"postgres",
-          "port":"5432",
-          "password":"SECRET!"
+        "container": {
+          "image":"kineticdata/task",
+          "tag":"4.4.0-SNAPSHOT",
         }
       }
     },
     "templates":[
       {
-        "url":"https://github.com/kineticdata/platform-template.git",
-        "commit":"fa1a15db29333e5c56d1e3547acf6004865f4759"
+        "url":"https://github.com/kineticdata/platform-template-base.git",
+        "commit":"8ac3ab96f269698caf8d3e5fbd791dfe3c987e97"
       }
     ]
   }
@@ -106,19 +91,13 @@ curl -X POST \
   "slug":"my-space",
   "host":"http://my-platform-server.io",
   "subdomains":true,
+  "log_level":"info",
   "components":{
-    "request-ce":{
+    "core":{
       "username":"admin",
       "password":"SECRET!",
       "space":{
-        "name":"My Space",
-        "users":[
-          {
-            "username":"integration-user",
-            "email":"DO_NOT_REPLY@my-platform-server.io",
-            "spaceAdmin": true
-          }
-        ]
+        "name":"My Space"
       }
     },
     "bridgehub":{
@@ -131,27 +110,21 @@ curl -X POST \
     },
     "discussions":{
       "username":"admin",
-      "password":"SECRET!",
-      "oauth-client":{
-        "id":"kinetic-bundle",
-        "secret":"SECRET!"
-      }
+      "password":"SECRET!"
     },
     "task":{
-      "image":"kineticdata/task:4.4.0-SNAPSHOT",
       "username":"admin",
       "password":"SECRET!",
-      "db":{
-        "host":"postgres",
-        "port":"5432",
-        "password":"SECRET!"
+      "container": {
+        "image":"kineticdata/task",
+        "tag":"4.4.0-SNAPSHOT",
       }
     }
   },
   "templates":[
     {
-      "url":"https://github.com/kineticdata/platform-template.git",
-      "commit":"fa1a15db29333e5c56d1e3547acf6004865f4759"
+      "url":"https://github.com/kineticdata/platform-template-base.git",
+      "commit":"8ac3ab96f269698caf8d3e5fbd791dfe3c987e97"
     }
   ]
 }'
@@ -168,19 +141,13 @@ POST /repair
     "slug":"my-space",
     "host":"http://my-platform-server.io",
     "subdomains":true,
+    "log_level":"info",
     "components":{
-      "request-ce":{
+      "core":{
         "username":"admin",
         "password":"SECRET!",
         "space":{
-          "name":"My Space",
-          "users":[
-            {
-              "username":"integration-user",
-              "email":"DO_NOT_REPLY@my-platform-server.io",
-              "spaceAdmin": true
-            }
-          ]
+          "name":"My Space"
         }
       },
       "bridgehub":{
@@ -193,27 +160,21 @@ POST /repair
       },
       "discussions":{
         "username":"admin",
-        "password":"SECRET!",
-        "oauth-client":{
-          "id":"kinetic-bundle",
-          "secret":"SECRET!"
-        }
+        "password":"SECRET!"
       },
       "task":{
-        "image":"kineticdata/task:4.4.0-SNAPSHOT",
         "username":"admin",
         "password":"SECRET!",
-        "db":{
-          "host":"postgres",
-          "port":"5432",
-          "password":"SECRET!"
+        "container": {
+          "image":"kineticdata/task",
+          "tag":"4.4.0-SNAPSHOT"
         }
       }
     },
     "templates":[
       {
-        "url":"https://github.com/kineticdata/platform-template.git",
-        "commit":"fa1a15db29333e5c56d1e3547acf6004865f4759"
+        "url":"https://github.com/kineticdata/platform-template-base.git",
+        "commit":"8ac3ab96f269698caf8d3e5fbd791dfe3c987e97"
       }
     ]
   }
@@ -231,19 +192,13 @@ curl -X POST \
   "slug":"my-space",
   "host":"http://my-platform-server.io",
   "subdomains":true,
+  "log_level":"info",
   "components":{
-    "request-ce":{
+    "core":{
       "username":"admin",
       "password":"SECRET!",
       "space":{
-        "name":"My Space",
-        "users":[
-          {
-            "username":"integration-user",
-            "email":"DO_NOT_REPLY@my-platform-server.io",
-            "spaceAdmin": true
-          }
-        ]
+        "name":"My Space"
       }
     },
     "bridgehub":{
@@ -256,27 +211,21 @@ curl -X POST \
     },
     "discussions":{
       "username":"admin",
-      "password":"SECRET!",
-      "oauth-client":{
-        "id":"kinetic-bundle",
-        "secret":"SECRET!"
-      }
+      "password":"SECRET!"
     },
     "task":{
-      "image":"kineticdata/task:4.4.0-SNAPSHOT",
       "username":"admin",
       "password":"SECRET!",
-      "db":{
-        "host":"postgres",
-        "port":"5432",
-        "password":"SECRET!"
+      "container": {
+        "image":"kineticdata/task",
+        "tag":"4.4.0-SNAPSHOT"
       }
     }
   },
   "templates":[
     {
-      "url":"https://github.com/kineticdata/platform-template.git",
-      "commit":"fa1a15db29333e5c56d1e3547acf6004865f4759"
+      "url":"https://github.com/kineticdata/platform-template-base.git",
+      "commit":"8ac3ab96f269698caf8d3e5fbd791dfe3c987e97"
     }
   ]
 }'

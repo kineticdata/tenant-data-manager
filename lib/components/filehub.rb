@@ -3,14 +3,15 @@ module Kinetic
     class Filehub
 
       attr_reader :host, :space_slug, :username, :password,
-                  :filestore_slug, :adapter_class, :adapter_properties
+                  :filestore_slug, :adapter_class, :adapter_properties, :log_level
 
       attr_accessor :access_key_id, :access_key_secret
       
       def initialize(options)
         @host = options["host"]
         @subdomains = options["subdomains"]
-        @space_slug = options["space-slug"]
+        @log_level = options["log_level"]
+        @space_slug = options["space_slug"]
         @username = options["username"] || "admin"
         @password = options["password"] || "admin"
         raise StandardError.new "Filehub requires a space slug." if @space_slug.nil?
@@ -54,6 +55,7 @@ module Kinetic
       def template_bindings
         {
           "api" => api,
+          "log_level" => @log_level,
           "server" => server,
           "space_slug" => @space_slug,
           "filestores" => {

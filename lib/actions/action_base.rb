@@ -2,7 +2,7 @@ module Kinetic
   module Platform
     class ActionBase
 
-      attr_reader :action, :slug, :templates,
+      attr_reader :action, :slug, :log_level, :templates,
                   :bridgehub, :core, :discussions, :filehub, :task
       
       INSTALL      = "install"
@@ -18,6 +18,7 @@ module Kinetic
           @action = options["action"]
           @slug = options["slug"]
           @subdomains = options["subdomains"].to_s.strip.downcase == "true"
+          @log_level = options["log_level"] || "off"
           @host = options["host"]
           @component_metadata = options["components"]
           @template_metadata = options["templates"]
@@ -65,8 +66,9 @@ module Kinetic
 
         options = { 
           "host"     => @host,
-          "space-slug" => @slug,
-          "subdomains" => @subdomains
+          "space_slug" => @slug,
+          "subdomains" => @subdomains,
+          "log_level" => @log_level
         }
         @component_metadata.map do |key,item|
           case key

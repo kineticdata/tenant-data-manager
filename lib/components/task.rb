@@ -2,7 +2,9 @@ module Kinetic
   module Platform
     class Task
     
-      attr_reader :host, :subdomains, :space_slug, :username, :password_key
+      attr_reader :host, :subdomains, :space_slug, :username, :password_key,
+                  :log_level
+
       attr_accessor :image, :tag, :password,
                     :service_user_username, :service_user_password
 
@@ -12,7 +14,8 @@ module Kinetic
       def initialize(options)
         @host = options["host"]
         @subdomains = options["subdomains"]
-        @space_slug = options["space-slug"]
+        @log_level = options["log_level"]
+        @space_slug = options["space_slug"]
         @username = options["username"] || "admin"
         @password_key = options["password"]
         raise StandardError.new "Task requires a space slug." if @space_slug.nil?
@@ -50,6 +53,7 @@ module Kinetic
         {
           "api" => api,
           "api_v2" => api_v2,
+          "log_level" => @log_level,
           "server" => server,
           "space_slug" => @space_slug,
           "username" => @username,
