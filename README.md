@@ -1,14 +1,12 @@
 # Tenant Data Manager
 
-A service that manages the installation, updating, and removal of all the component data for a tenant space in the Kinetic Platform.
+The tenant data manager is responsible for creating a space in Kinetic Core, creating a Kinetic Task environment for the space, and configuring all the necessary data components for the space to function properly.
+
+The tenant data manager is currently running as a web application with a REST API that accepts HTTP POST requests from within the kubernetes cluser.
 
 The service runs on TCP port 4567.
 
-## API Actions
-
-The following API actions are supported by this service.
-
-### Health
+## Health
 
 Responds with a `running` status if the service is running.
 
@@ -20,7 +18,7 @@ cURL example:
 curl http://localhost:4567
 ```
 
-### Version
+## Version
 
 Responds with the service version.
 
@@ -32,54 +30,54 @@ cURL example:
 curl http://localhost:4567/version
 ```
 
-### Install Tenant Space
+## Actions
 
-Creates a tenant space, sets up the tenant ingress rules, starts a Kinetic Task instance, and creates all necessary component data for this tenant space.
+The following actions are currently supported by the tenant data manager web application:
 
-```
-POST /install
-  {
-    "action":"install",
-    "slug":"my-space",
-    "host":"http://my-platform-server.io",
-    "subdomains":true,
-    "log_level":"info",
-    "components":{
-      "core":{
-        "username":"admin",
-        "password":"SECRET!"
-      },
-      "bridgehub":{
-        "username":"admin",
-        "password":"SECRET!"
-      },
-      "filehub":{
-        "username":"admin",
-        "password":"SECRET!"
-      },
-      "discussions":{
-        "username":"admin",
-        "password":"SECRET!"
-      },
-      "task":{
-        "username":"admin",
-        "password":"SECRET!",
-        "container": {
-          "image":"kineticdata/task",
-          "tag":"4.4.0-SNAPSHOT",
-        }
-      }
-    },
-    "templates":[
-      {
-        "url":"https://github.com/kineticdata/platform-template-base.git",
-        "commit":"8ac3ab96f269698caf8d3e5fbd791dfe3c987e97"
-      }
-    ]
-  }
-```
+* install - use this command when creating a new tenant space
+* decommission - use this command to remove a tenant space, does not delete the task database
+* repair - use this command to restore the integrations between all the platform components
+* uninstall - use this command to delete the task database
+* upgrade - use this command when upgrading template data
 
-cURL example:
+For each of the templates passed with the action data, the action script will call a corresponding action script in the template. The default template script can be overridden by passing in the name of the script, and any additional arguments that the template script may require.
+
+For instance, if the `install` action is called, by default the tenant data manager application will call the `install.rb` script in the template repository.
+
+### Install Action
+
+The following properties must be provided to the tenant data manager when installing a tenant space.
+
+* action -     **install**
+* slug -       **my-space**                 # the space slug to create
+* host -       **http://kinops-test.io**    # the URL of the core server
+* subdomains - **true**                     # whether subdomains are used for tenant spaces
+* log_level -  **info**                     # SDK log level passed to templates scripts
+* components                                # Map of platform component configurations
+  * core
+    * username  - **admin**                 # Name of the core system admin user
+    * password  - **admin**                 # Password of the core system admin user
+    * space
+      * name    - **My Space**              # Name of the space to create
+  * bridgehub
+    * username - **admin**                  # Name of the bridgehub admin user
+    * password - **admin**                  # Password of the bridgehub admin user
+  * filehub
+    * username - **admin**                  # Name of the filehub admin user
+    * password - **admin**                  # Password of the filehub admin user
+  * task
+    * username - **admin**                  # Name of the task configurator admin user
+    * password - **KINETIC_TASK_CONFIGURATOR_PASSWORD** # Environment variable name for the task configurator admin password
+    * container
+      * image - **kineticdata/task**        # Name of the docker image to use for Kinetic Task
+      * tag - **4.4.0-SNAPSHOT**            # Tag of the docker image to use for Kinetic Task
+* templates                                 # Array of templates that will be called
+  * url - **https://github.com/kineticdata/platform-template-base.git** # URL of the template repository in GitHub
+  * branch | tag | commit - **develop**     # Git branch name, tag name, or commit hash
+  * script - **install.rb**                 # Optional name of script to run in the template, default: `#{action}.rb`
+  * script-args - **{}**                   # Optional arguments passed to the template script, default: `{}`
+
+#### cURL example to install tenant
 
 ```sh
 curl -X POST \
@@ -87,100 +85,141 @@ curl -X POST \
   -H 'Accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
-  "action":"install",
-  "slug":"my-space",
-  "host":"http://my-platform-server.io",
-  "subdomains":true,
-  "log_level":"info",
-  "components":{
-    "core":{
-      "username":"admin",
-      "password":"SECRET!",
-      "space":{
-        "name":"My Space"
-      }
-    },
-    "bridgehub":{
-      "username":"admin",
-      "password":"SECRET!"
-    },
-    "filehub":{
-      "username":"admin",
-      "password":"SECRET!"
-    },
-    "discussions":{
-      "username":"admin",
-      "password":"SECRET!"
-    },
-    "task":{
-      "username":"admin",
-      "password":"SECRET!",
-      "container": {
-        "image":"kineticdata/task",
-        "tag":"4.4.0-SNAPSHOT",
-      }
-    }
-  },
-  "templates":[
-    {
-      "url":"https://github.com/kineticdata/platform-template-base.git",
-      "commit":"8ac3ab96f269698caf8d3e5fbd791dfe3c987e97"
-    }
-  ]
-}'
-```
-
-### Repair Space
-
-Repairs an existing tenant space, updating any component data that may be linked between multiple applications.
-
-```
-POST /repair
-  {
-    "action":"repair",
-    "slug":"my-space",
-    "host":"http://my-platform-server.io",
-    "subdomains":true,
-    "log_level":"info",
-    "components":{
-      "core":{
-        "username":"admin",
-        "password":"SECRET!",
-        "space":{
-          "name":"My Space"
+    "action": "install",
+    "slug": "my-space",
+    "host": "http://kinops-test.io",
+    "subdomains" :true,
+    "log_level": "info",
+    "components": {
+      "core": {
+        "username": "admin",
+        "password": "admin",
+        "space": {
+          "name": "My Space"
         }
       },
-      "bridgehub":{
-        "username":"admin",
-        "password":"SECRET!"
+      "bridgehub": {
+        "username": "admin",
+        "password": "admin"
       },
-      "filehub":{
-        "username":"admin",
-        "password":"SECRET!"
+      "filehub": {
+        "username": "admin",
+        "password": "admin"
       },
-      "discussions":{
-        "username":"admin",
-        "password":"SECRET!"
-      },
-      "task":{
-        "username":"admin",
-        "password":"SECRET!",
+      "task": {
+        "username": "admin",
+        "password": "KINETIC_TASK_CONFIGURATOR_PASSWORD",
         "container": {
-          "image":"kineticdata/task",
-          "tag":"4.4.0-SNAPSHOT"
+          "image": "kineticdata/task",
+          "tag": "4.4.0-SNAPSHOT"
         }
       }
     },
-    "templates":[
+    "templates": [
       {
-        "url":"https://github.com/kineticdata/platform-template-base.git",
-        "commit":"8ac3ab96f269698caf8d3e5fbd791dfe3c987e97"
+        "url": "https://github.com/kineticdata/platform-template-base.git",
+        "branch":"develop"
       }
     ]
-  }
+  }'
 ```
 
-cURL example:
+### Decommission Action
+
+The following properties must be provided to the tenant data manager when decommissioning a tenant space.
+
+* action -     **decommission**
+* slug -       **my-space**                 # the space slug to decommission
+* host -       **http://kinops-test.io**    # the URL of the core server
+* subdomains - **true**                     # whether subdomains are used for tenant spaces
+* log_level -  **info**                     # SDK log level passed to templates scripts
+* components                                # Map of platform component configurations
+  * core
+    * username  - **admin**                 # Name of the core system admin user
+    * password  - **admin**                 # Password of the core system admin user
+  * bridgehub
+    * username - **admin**                  # Name of the bridgehub admin user
+    * password - **admin**                  # Password of the bridgehub admin user
+  * filehub
+    * username - **admin**                  # Name of the filehub admin user
+    * password - **admin**                  # Password of the filehub admin user
+  * task
+    * username - **admin**                  # Name of the task configurator admin user
+    * password - **KINETIC_TASK_CONFIGURATOR_PASSWORD** # Environment variable name for the task configurator admin password
+    * container
+      * image - **kineticdata/task**        # Name of the docker image to use for Kinetic Task
+      * tag - **4.4.0-SNAPSHOT**            # Tag of the docker image to use for Kinetic Task
+
+#### cURL example to decommission tenant
+
+```sh
+curl -X POST \
+  http://localhost:4567/decommission \
+  -H 'Accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "action": "decommission",
+    "slug": "my-space",
+    "host": "http://kinops-test.io",
+    "subdomains" :true,
+    "log_level": "info",
+    "components": {
+      "core": {
+        "username": "admin",
+        "password": "admin"
+      },
+      "bridgehub": {
+        "username": "admin",
+        "password": "admin"
+      },
+      "filehub": {
+        "username": "admin",
+        "password": "admin"
+      },
+      "task": {
+        "username": "admin",
+        "password": "KINETIC_TASK_CONFIGURATOR_PASSWORD",
+        "container": {
+          "image": "kineticdata/task",
+          "tag": "4.4.0-SNAPSHOT"
+        }
+      }
+    }
+  }'
+```
+
+### Repair Action
+
+The following properties must be provided to the tenant data manager when repairing a tenant space.
+
+* action -     **repair**
+* slug -       **my-space**                 # the space slug to repair
+* host -       **http://kinops-test.io**    # the URL of the core server
+* subdomains - **true**                     # whether subdomains are used for tenant spaces
+* log_level -  **info**                     # SDK log level passed to templates scripts
+* components                                # Map of platform component configurations
+  * core
+    * username  - **admin**                 # Name of the core system admin user
+    * password  - **admin**                 # Password of the core system admin user
+  * bridgehub
+    * username - **admin**                  # Name of the bridgehub admin user
+    * password - **admin**                  # Password of the bridgehub admin user
+  * filehub
+    * username - **admin**                  # Name of the filehub admin user
+    * password - **admin**                  # Password of the filehub admin user
+  * task
+    * username - **admin**                  # Name of the task configurator admin user
+    * password - **KINETIC_TASK_CONFIGURATOR_PASSWORD** # Environment variable name for the task configurator admin password
+    * container
+      * image - **kineticdata/task**        # Name of the docker image to use for Kinetic Task
+      * tag - **4.4.0-SNAPSHOT**            # Tag of the docker image to use for Kinetic Task
+* templates                                 # Array of templates that will be called
+  * url - **https://github.com/kineticdata/platform-template-base.git** # URL of the template repository in GitHub
+  * branch | tag | commit - **develop**     # Git branch name, tag name, or commit hash
+  * script - **repair.rb**                  # Optional name of script to run in the template, default: `#{action}.rb`
+  * script-args - **{}**                    # Optional arguments passed to the template script, default: `{}`
+
+#### cURL example to repair tenant
 
 ```sh
 curl -X POST \
@@ -188,78 +227,156 @@ curl -X POST \
   -H 'Accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
-  "action":"repair",
-  "slug":"my-space",
-  "host":"http://my-platform-server.io",
-  "subdomains":true,
-  "log_level":"info",
-  "components":{
-    "core":{
-      "username":"admin",
-      "password":"SECRET!",
-      "space":{
-        "name":"My Space"
+    "action": "repair",
+    "slug": "my-space",
+    "host": "http://kinops-test.io",
+    "subdomains" :true,
+    "log_level": "info",
+    "components": {
+      "core": {
+        "username": "admin",
+        "password": "admin"
+      },
+      "bridgehub": {
+        "username": "admin",
+        "password": "admin"
+      },
+      "filehub": {
+        "username": "admin",
+        "password": "admin"
+      },
+      "task": {
+        "username": "admin",
+        "password": "KINETIC_TASK_CONFIGURATOR_PASSWORD",
+        "container": {
+          "image": "kineticdata/task",
+          "tag": "4.4.0-SNAPSHOT"
+        }
       }
     },
-    "bridgehub":{
-      "username":"admin",
-      "password":"SECRET!"
-    },
-    "filehub":{
-      "username":"admin",
-      "password":"SECRET!"
-    },
-    "discussions":{
-      "username":"admin",
-      "password":"SECRET!"
-    },
-    "task":{
-      "username":"admin",
-      "password":"SECRET!",
-      "container": {
-        "image":"kineticdata/task",
-        "tag":"4.4.0-SNAPSHOT"
+    "templates": [
+      {
+        "url": "https://github.com/kineticdata/platform-template-base.git",
+        "branch":"develop"
+      }
+    ]
+  }'
+```
+
+### Uninstall Action
+
+The following properties must be provided to the tenant data manager when uninstalling a tenant space.
+
+* action -     **uninstall**
+* slug -       **my-space**                 # the space slug to uninstall
+* host -       **http://kinops-test.io**    # the URL of the core server
+* subdomains - **true**                     # whether subdomains are used for tenant spaces
+* log_level -  **info**                     # SDK log level passed to templates scripts
+* components                                # Map of platform component configurations
+  * task
+    * username - **admin**                  # Name of the task configurator admin user
+    * password - **KINETIC_TASK_CONFIGURATOR_PASSWORD** # Environment variable name for the task configurator admin password
+    * container
+      * image - **kineticdata/task**        # Name of the docker image to use for Kinetic Task
+      * tag - **4.4.0-SNAPSHOT**            # Tag of the docker image to use for Kinetic Task
+
+#### cURL example to uninstall tenant
+
+```sh
+curl -X POST \
+  http://localhost:4567/decommission \
+  -H 'Accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "action": "decommission",
+    "slug": "my-space",
+    "host": "http://kinops-test.io",
+    "subdomains" :true,
+    "log_level": "info",
+    "components": {
+      "task": {
+        "username": "admin",
+        "password": "KINETIC_TASK_CONFIGURATOR_PASSWORD",
+        "container": {
+          "image": "kineticdata/task",
+          "tag": "4.4.0-SNAPSHOT"
+        }
       }
     }
-  },
-  "templates":[
-    {
-      "url":"https://github.com/kineticdata/platform-template-base.git",
-      "commit":"8ac3ab96f269698caf8d3e5fbd791dfe3c987e97"
-    }
-  ]
-}'
+  }'
 ```
 
-### Upgrade Space
+### Upgrade Action
 
-Upgrades an existing tenant space, updating any specified components.
+The following properties must be provided to the tenant data manager when upgrading a tenant space.
 
-```
-POST /upgrade
-  {
-    ...
-  }
-```
+* action -     **upgrade**
+* slug -       **my-space**                 # the space slug to upgrade
+* host -       **http://kinops-test.io**    # the URL of the core server
+* subdomains - **true**                     # whether subdomains are used for tenant spaces
+* log_level -  **info**                     # SDK log level passed to templates scripts
+* components                                # Map of platform component configurations
+  * core
+    * username  - **admin**                 # Name of the core system admin user
+    * password  - **admin**                 # Password of the core system admin user
+  * bridgehub
+    * username - **admin**                  # Name of the bridgehub admin user
+    * password - **admin**                  # Password of the bridgehub admin user
+  * filehub
+    * username - **admin**                  # Name of the filehub admin user
+    * password - **admin**                  # Password of the filehub admin user
+  * task
+    * username - **admin**                  # Name of the task configurator admin user
+    * password - **KINETIC_TASK_CONFIGURATOR_PASSWORD** # Environment variable name for the task configurator admin password
+    * container
+      * image - **kineticdata/task**        # Name of the docker image to use for Kinetic Task
+      * tag - **4.4.0-SNAPSHOT**            # Tag of the docker image to use for Kinetic Task
+* templates                                 # Array of templates that will be called
+  * url - **https://github.com/kineticdata/platform-template-base.git** # URL of the template repository in GitHub
+  * branch | tag | commit - **develop**     # Git branch name, tag name, or commit hash
+  * script - **upgrade.rb**                 # Optional name of script to run in the template, default: `#{action}.rb`
+  * script-args - **{}**                    # Optional arguments passed to the template script, default: `{}`
 
-### Decommission Space
+#### cURL example to upgrade tenant
 
-Removes a tenant space and it's Kinetic Task instance from service. This action does not delete the task database or filestore files however, as this allows for the space to be restored in the future if needed.
-
-```
-POST /decommission
-  {
-    ...
-  }
-```
-
-### Uninstall Space
-
-Deletes the task database and filestore files for the tenant space, effective rendering the space unrecoverable.
-
-```
-POST /uninstall
-  {
-    ...
-  }
+```sh
+curl -X POST \
+  http://localhost:4567/upgrade \
+  -H 'Accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "action": "upgrade",
+    "slug": "my-space",
+    "host": "http://kinops-test.io",
+    "subdomains" :true,
+    "log_level": "info",
+    "components": {
+      "core": {
+        "username": "admin",
+        "password": "admin"
+      },
+      "bridgehub": {
+        "username": "admin",
+        "password": "admin"
+      },
+      "filehub": {
+        "username": "admin",
+        "password": "admin"
+      },
+      "task": {
+        "username": "admin",
+        "password": "KINETIC_TASK_CONFIGURATOR_PASSWORD",
+        "container": {
+          "image": "kineticdata/task",
+          "tag": "4.4.0-SNAPSHOT"
+        }
+      }
+    },
+    "templates": [
+      {
+        "url": "https://github.com/kineticdata/platform-template-base.git",
+        "branch":"develop"
+      }
+    ]
+  }'
 ```
