@@ -50,7 +50,7 @@ The following properties must be provided to the tenant data manager when instal
 
 * action -     **install**
 * slug -       **my-space**                 # the space slug to create
-* host -       **http://kinops-test.io**    # the URL of the core server
+* host -       **https://kinops-test.io**   # the URL of the core server
 * subdomains - **true**                     # whether subdomains are used for tenant spaces
 * log_level -  **info**                     # SDK log level passed to templates scripts
 * components                                # Map of platform component configurations
@@ -66,11 +66,12 @@ The following properties must be provided to the tenant data manager when instal
     * username - **admin**                  # Name of the filehub admin user
     * password - **admin**                  # Password of the filehub admin user
   * task
+    * license                               # Full content of the license
     * username - **admin**                  # Name of the task configurator admin user
     * password - **KINETIC_TASK_CONFIGURATOR_PASSWORD** # Environment variable name for the task configurator admin password
     * container
       * image - **kineticdata/task**        # Name of the docker image to use for Kinetic Task
-      * tag - **4.4.0-SNAPSHOT**            # Tag of the docker image to use for Kinetic Task
+      * tag - **4.4.0**                     # Tag of the docker image to use for Kinetic Task
 * templates                                 # Array of templates that will be called
   * url - **https://github.com/kineticdata/platform-template-base.git** # URL of the template repository in GitHub
   * branch | tag | commit - **develop**     # Git branch name, tag name, or commit hash
@@ -87,7 +88,7 @@ curl -X POST \
   -d '{
     "action": "install",
     "slug": "my-space",
-    "host": "http://kinops-test.io",
+    "host": "https://kinops-test.io",
     "subdomains" :true,
     "log_level": "info",
     "components": {
@@ -107,11 +108,12 @@ curl -X POST \
         "password": "admin"
       },
       "task": {
+        "license": null,
         "username": "admin",
         "password": "KINETIC_TASK_CONFIGURATOR_PASSWORD",
         "container": {
           "image": "kineticdata/task",
-          "tag": "4.4.0-SNAPSHOT"
+          "tag": "4.4.0"
         }
       }
     },
@@ -130,7 +132,7 @@ The following properties must be provided to the tenant data manager when decomm
 
 * action -     **decommission**
 * slug -       **my-space**                 # the space slug to decommission
-* host -       **http://kinops-test.io**    # the URL of the core server
+* host -       **https://kinops-test.io**   # the URL of the core server
 * subdomains - **true**                     # whether subdomains are used for tenant spaces
 * log_level -  **info**                     # SDK log level passed to templates scripts
 * components                                # Map of platform component configurations
@@ -148,7 +150,7 @@ The following properties must be provided to the tenant data manager when decomm
     * password - **KINETIC_TASK_CONFIGURATOR_PASSWORD** # Environment variable name for the task configurator admin password
     * container
       * image - **kineticdata/task**        # Name of the docker image to use for Kinetic Task
-      * tag - **4.4.0-SNAPSHOT**            # Tag of the docker image to use for Kinetic Task
+      * tag - **4.4.0**            # Tag of the docker image to use for Kinetic Task
 
 #### cURL example to decommission tenant
 
@@ -160,7 +162,7 @@ curl -X POST \
   -d '{
     "action": "decommission",
     "slug": "my-space",
-    "host": "http://kinops-test.io",
+    "host": "https://kinops-test.io",
     "subdomains" :true,
     "log_level": "info",
     "components": {
@@ -181,7 +183,7 @@ curl -X POST \
         "password": "KINETIC_TASK_CONFIGURATOR_PASSWORD",
         "container": {
           "image": "kineticdata/task",
-          "tag": "4.4.0-SNAPSHOT"
+          "tag": "4.4.0"
         }
       }
     }
@@ -194,7 +196,7 @@ The following properties must be provided to the tenant data manager when repair
 
 * action -     **repair**
 * slug -       **my-space**                 # the space slug to repair
-* host -       **http://kinops-test.io**    # the URL of the core server
+* host -       **https://kinops-test.io**   # the URL of the core server
 * subdomains - **true**                     # whether subdomains are used for tenant spaces
 * log_level -  **info**                     # SDK log level passed to templates scripts
 * components                                # Map of platform component configurations
@@ -212,7 +214,7 @@ The following properties must be provided to the tenant data manager when repair
     * password - **KINETIC_TASK_CONFIGURATOR_PASSWORD** # Environment variable name for the task configurator admin password
     * container
       * image - **kineticdata/task**        # Name of the docker image to use for Kinetic Task
-      * tag - **4.4.0-SNAPSHOT**            # Tag of the docker image to use for Kinetic Task
+      * tag - **4.4.0**            # Tag of the docker image to use for Kinetic Task
 * templates                                 # Array of templates that will be called
   * url - **https://github.com/kineticdata/platform-template-base.git** # URL of the template repository in GitHub
   * branch | tag | commit - **develop**     # Git branch name, tag name, or commit hash
@@ -229,7 +231,7 @@ curl -X POST \
   -d '{
     "action": "repair",
     "slug": "my-space",
-    "host": "http://kinops-test.io",
+    "host": "https://kinops-test.io",
     "subdomains" :true,
     "log_level": "info",
     "components": {
@@ -250,7 +252,7 @@ curl -X POST \
         "password": "KINETIC_TASK_CONFIGURATOR_PASSWORD",
         "container": {
           "image": "kineticdata/task",
-          "tag": "4.4.0-SNAPSHOT"
+          "tag": "4.4.0"
         }
       }
     },
@@ -269,7 +271,7 @@ The following properties must be provided to the tenant data manager when uninst
 
 * action -     **uninstall**
 * slug -       **my-space**                 # the space slug to uninstall
-* host -       **http://kinops-test.io**    # the URL of the core server
+* host -       **https://kinops-test.io**   # the URL of the core server
 * subdomains - **true**                     # whether subdomains are used for tenant spaces
 * log_level -  **info**                     # SDK log level passed to templates scripts
 * components                                # Map of platform component configurations
@@ -278,7 +280,7 @@ The following properties must be provided to the tenant data manager when uninst
     * password - **KINETIC_TASK_CONFIGURATOR_PASSWORD** # Environment variable name for the task configurator admin password
     * container
       * image - **kineticdata/task**        # Name of the docker image to use for Kinetic Task
-      * tag - **4.4.0-SNAPSHOT**            # Tag of the docker image to use for Kinetic Task
+      * tag - **4.4.0**            # Tag of the docker image to use for Kinetic Task
 
 #### cURL example to uninstall tenant
 
@@ -290,7 +292,7 @@ curl -X POST \
   -d '{
     "action": "decommission",
     "slug": "my-space",
-    "host": "http://kinops-test.io",
+    "host": "https://kinops-test.io",
     "subdomains" :true,
     "log_level": "info",
     "components": {
@@ -299,7 +301,7 @@ curl -X POST \
         "password": "KINETIC_TASK_CONFIGURATOR_PASSWORD",
         "container": {
           "image": "kineticdata/task",
-          "tag": "4.4.0-SNAPSHOT"
+          "tag": "4.4.0"
         }
       }
     }
@@ -312,7 +314,7 @@ The following properties must be provided to the tenant data manager when upgrad
 
 * action -     **upgrade**
 * slug -       **my-space**                 # the space slug to upgrade
-* host -       **http://kinops-test.io**    # the URL of the core server
+* host -       **https://kinops-test.io**   # the URL of the core server
 * subdomains - **true**                     # whether subdomains are used for tenant spaces
 * log_level -  **info**                     # SDK log level passed to templates scripts
 * components                                # Map of platform component configurations
@@ -330,7 +332,7 @@ The following properties must be provided to the tenant data manager when upgrad
     * password - **KINETIC_TASK_CONFIGURATOR_PASSWORD** # Environment variable name for the task configurator admin password
     * container
       * image - **kineticdata/task**        # Name of the docker image to use for Kinetic Task
-      * tag - **4.4.0-SNAPSHOT**            # Tag of the docker image to use for Kinetic Task
+      * tag - **4.4.0**            # Tag of the docker image to use for Kinetic Task
 * templates                                 # Array of templates that will be called
   * url - **https://github.com/kineticdata/platform-template-base.git** # URL of the template repository in GitHub
   * branch | tag | commit - **develop**     # Git branch name, tag name, or commit hash
@@ -347,7 +349,7 @@ curl -X POST \
   -d '{
     "action": "upgrade",
     "slug": "my-space",
-    "host": "http://kinops-test.io",
+    "host": "https://kinops-test.io",
     "subdomains" :true,
     "log_level": "info",
     "components": {
@@ -368,7 +370,7 @@ curl -X POST \
         "password": "KINETIC_TASK_CONFIGURATOR_PASSWORD",
         "container": {
           "image": "kineticdata/task",
-          "tag": "4.4.0-SNAPSHOT"
+          "tag": "4.4.0"
         }
       }
     },

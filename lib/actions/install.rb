@@ -71,8 +71,6 @@ module Kinetic
         end
 
         # deploy space task application
-        # TODO - update task deployer to accept image and tag arguments that
-        #        should be used for task deployment
         Kinetic::Platform.logger.info "Deploying the #{@core.space_name} space task application"
         http = Http.new
         payload = { 
@@ -331,7 +329,14 @@ module Kinetic
           Kinetic::Platform.logger.info "POST #{url} - #{res.status}: #{res.message}"
         end
 
-        # generate and install a task license
+        # import the task license
+        if !@task.license.nil?
+            Kinetic::Platform.logger.info "Importing the #{@core.space_name} task license"
+            http = Http.new(@task.username, @task.password)
+            payload = { "licenseContent" => @task.license }
+            url = "#{@task.api_v2}/config/license"
+            res = http.post(url, payload, http.default_headers)
+        end
 
         
         # process each of the templates

@@ -2,7 +2,8 @@ module Kinetic
   module Platform
     class Task
     
-      attr_reader :host, :subdomains, :username, :password_key, :log_level
+      attr_reader :host, :subdomains, :username, :password_key, :license,
+                  :log_level
 
       attr_accessor :space_slug, :image, :tag, :password,
                     :service_user_username, :service_user_password
@@ -17,6 +18,7 @@ module Kinetic
         @space_slug = options["space_slug"]
         @username = options["username"] || "admin"
         @password_key = options["password"]
+        @license = options["license"]
 
         container = options["container"] || {}
         @image = container["image"] || DEFAULT_CONTAINER_IMAGE
