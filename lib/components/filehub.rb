@@ -2,10 +2,10 @@ module Kinetic
   module Platform
     class Filehub
 
-      attr_reader :host, :space_slug, :username, :password,
-                  :filestore_slug, :adapter_class, :adapter_properties, :log_level
+      attr_reader :host, :username, :password, :log_level,
+                  :adapter_class, :adapter_properties
 
-      attr_accessor :access_key_id, :access_key_secret
+      attr_accessor :space_slug, :access_key_id, :access_key_secret
       
       def initialize(options)
         @host = options["host"]
@@ -14,9 +14,6 @@ module Kinetic
         @space_slug = options["space_slug"]
         @username = options["username"] || "admin"
         @password = options["password"] || "admin"
-        raise StandardError.new "Filehub requires a space slug." if @space_slug.nil?
-
-        @filestore_slug = "#{@space_slug}-core"
 
         @access_key_id, @access_key_secret = nil, nil
 
@@ -48,8 +45,16 @@ module Kinetic
         # root directory already created on the file system. This may cause 
         # problems if multiple spaces are created.
 
-        # "/home/filesDirectory/#{@filestore_slug}"
+        # "/home/filesDirectory/#{filestore_slug}"
         "/home/filesDirectory"
+      end
+
+      def filestore_slug
+        "#{@space_slug}-core"
+      end
+
+      def filestore_path
+        "#{server}/filestores/#{filestore_slug}"
       end
 
       def template_bindings
@@ -62,8 +67,8 @@ module Kinetic
             "kinetic-core" => {
               "access_key_id" => @access_key_id,
               "access_key_secret" => @access_key_secret,
-              "filestore_path" => "#{server}/filestores/#{@filestore_slug}",
-              "slug" => @filestore_slug
+              "filestore_path" => filestore_path,
+              "slug" => filestore_slug
             }
           }
         }

@@ -2,15 +2,16 @@ module Kinetic
   module Platform
     class Discussions
 
-      attr_reader :host, :subdomains, :space_slug,
+      attr_reader :host, :subdomains,
                   :oauth_client_id, :oauth_client_secret, :log_level
+      
+      attr_accessor :space_slug
       
       def initialize(options)
         @host = options["host"]
         @subdomains = options["subdomains"]
         @log_level = options["log_level"]
         @space_slug = options["space_slug"]
-        raise StandardError.new "Discussions requires a space slug." if @space_slug.nil?
 
         oauth_client = options["oauth-client"] || {}
         @oauth_client_id = oauth_client["id"] || "kinetic-bundle"

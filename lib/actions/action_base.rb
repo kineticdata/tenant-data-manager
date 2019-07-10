@@ -39,7 +39,7 @@ module Kinetic
 
       def validate
         validate_action
-        validate_slug
+        validate_slug unless @action == INSTALL
         validate_host
         validate_components
         validate_templates
@@ -96,6 +96,27 @@ module Kinetic
             Kinetic::Platform::Template.new(@action, item)
           end
         end
+      end
+
+      def generate_space_slug
+        rand(9999999).to_s.rjust(7,'0')
+      end
+
+      def space_exists?(space_slug)
+        # check if space slug is already used
+        Kinetic::Platform.logger.info "Checking if the #{space_slug} space slug is already installed"
+        http = Http.new(@core.username, @core.password)
+        res = http.get("#{@core.system_api}/spaces/#{space_slug}",
+          {}, http.default_headers)
+
+        # raise an error if the state of the space slug could not be determined
+        if res.status != 200 && res.status != 404
+          msg = "#{res.status}: Aborting #{ACTION} of space slug #{space_slug}, #{res.message}"
+          raise StandardError.new msg
+        end
+
+        # return true if space exists, or false if it doesn't exist
+        res.status == 200
       end
 
     end

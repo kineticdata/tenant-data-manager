@@ -2,10 +2,10 @@ module Kinetic
   module Platform
     class Core
   
-      attr_reader :host, :subdomains, :space_slug, :username, :password,
-                  :space_name, :log_level
+      attr_reader :host, :subdomains, :username, :password, :space_name,
+                  :log_level
 
-      attr_accessor :service_user_username, :service_user_password
+      attr_accessor :space_slug, :service_user_username, :service_user_password
 
       def initialize(options)
         @host = options["host"]
@@ -14,7 +14,6 @@ module Kinetic
         @space_slug = options["space_slug"]
         @username = options["username"] || "admin"
         @password = options["password"] || "admin"
-        raise StandardError.new "Core requires a space slug." if @space_slug.nil?
 
         space = options["space"] || {}
         @space_name = space["name"] || @space_slug

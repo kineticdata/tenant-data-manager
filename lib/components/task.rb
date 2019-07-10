@@ -2,10 +2,9 @@ module Kinetic
   module Platform
     class Task
     
-      attr_reader :host, :subdomains, :space_slug, :username, :password_key,
-                  :log_level
+      attr_reader :host, :subdomains, :username, :password_key, :log_level
 
-      attr_accessor :image, :tag, :password,
+      attr_accessor :space_slug, :image, :tag, :password,
                     :service_user_username, :service_user_password
 
       DEFAULT_CONTAINER_IMAGE = "kineticdata/kinetic-task"
@@ -18,7 +17,6 @@ module Kinetic
         @space_slug = options["space_slug"]
         @username = options["username"] || "admin"
         @password_key = options["password"]
-        raise StandardError.new "Task requires a space slug." if @space_slug.nil?
 
         container = options["container"] || {}
         @image = container["image"] || DEFAULT_CONTAINER_IMAGE
