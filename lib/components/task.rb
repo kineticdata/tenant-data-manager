@@ -46,7 +46,7 @@ module Kinetic
       end
 
       def deployer_api
-        "http://kubectl-pod-api.kd-pod-admin"
+        "http://tenant-infrastructure-manager"
       end
 
       def template_bindings

@@ -18,11 +18,10 @@ module Kinetic
         if res.status == 404
           # set the admin user credentials that will be created in all
           # spaces
-          # TODO: move username and email to secrets or values.yaml
+          # TODO: move username to secrets or values.yaml
           # TODO: move password to secrets
           admin_username = "kdadmin"
           admin_password = "admin"
-          admin_email    = "kdadmin@kinops.io"
 
           # set the service user credentials that will be used by the
           # applications where needed to communitcate with each other
@@ -35,8 +34,8 @@ module Kinetic
           # the service user
           @bridgehub.service_user_username  = service_user_username
           @bridgehub.service_user_password  = service_user_password
-          @core.service_user_username = service_user_username
-          @core.service_user_password = service_user_password
+          @core.service_user_username       = service_user_username
+          @core.service_user_password       = service_user_password
           @task.service_user_username       = service_user_username
           @task.service_user_password       = service_user_password
 
@@ -86,6 +85,11 @@ module Kinetic
             sleep 1
           end
 
+          if !subdomain_ready
+            raise StandardError.new "The #{ACTION} action for the #{@core.space_slug} space failed. The space cannot be reached."
+          end
+
+
           # create the datastore submission in the environment datastore
               # store the TaskImage:Tag property as a submission value
               # currently this is passed in from the values.yaml file
@@ -98,7 +102,6 @@ module Kinetic
             "space_slug" => @core.space_slug,
             "username" => admin_username,
             "password" => admin_password,
-            "email" => admin_email,
             "enabled" => true,
             "spaceAdmin" => true
           }
@@ -296,8 +299,7 @@ module Kinetic
               url = "#{@task.api_v2}/config/auth"
               res = http.put(url, payload, http.default_headers)
             else
-              "#{ACTION} failed. Task did not startup in the allowable timeframe."
-              return
+              raise StandardError.new "The #{ACTION} action for the #{@core.space_slug} space failed. Task did not startup in the allowable timeframe."
             end
           else
             Kinetic::Platform.logger.info "POST #{url} - #{res.status}: #{res.message}"
