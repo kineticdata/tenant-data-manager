@@ -20,8 +20,8 @@ module Kinetic
           @subdomains = options["subdomains"].to_s.strip.downcase == "true"
           @log_level = options["log_level"] || "off"
           @host = options["host"]
-          @component_metadata = options["components"]
-          @template_metadata = options["templates"]
+          @component_metadata = options["components"] || {}
+          @template_metadata = options["templates"] || []
           # validate the arguments
           validate
         rescue Exception => e
@@ -61,15 +61,21 @@ module Kinetic
       end
 
       def validate_components
-        raise "`components` must be a hash or object of platform component information." if
-          !@component_metadata.is_a?(Hash) || @component_metadata.empty?
 
+        if !@component_metadata.is_a?(Hash)
+          raise "`components` must be a hash or object of platform component information."
+        end
+          
         options = { 
           "host"     => @host,
           "space_slug" => @slug,
           "subdomains" => @subdomains,
-          "log_level" => @log_level
+          "log_level" => @log_level,
+          "username" => Kinetic::Platform::Kubernetes.decode_secret("system_username", "shared-secrets", "kinetic"),
+          "password" => Kinetic::Platform::Kubernetes.decode_secret("system_password", "shared-secrets", "kinetic")
         }
+
+        # Create the components if they were defined in the passed in data
         @component_metadata.map do |key,item|
           case key
           when "bridgehub"
@@ -84,6 +90,13 @@ module Kinetic
             @task = Kinetic::Platform::Task.new(options.merge(item))
           end
         end
+
+        # Create any components that were not defined in the passed in data
+        @bridgehub = Kinetic::Platform::Bridgehub.new(options) if @bridgehub.nil?
+        @core = Kinetic::Platform::Core.new(options) if @core.nil?
+        @discussions = Kinetic::Platform::Discussions.new(options) if @discussions.nil?
+        @filehub = Kinetic::Platform::Filehub.new(options) if @filehub.nil?
+        @task = Kinetic::Platform::Task.new(options) if @task.nil?
       end
 
       def validate_templates

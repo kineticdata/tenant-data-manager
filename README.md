@@ -55,16 +55,8 @@ The following properties must be provided to the tenant data manager when instal
 * log_level -  **info**                     # SDK log level passed to templates scripts
 * components                                # Map of platform component configurations
   * core
-    * username  - **admin**                 # Name of the core system admin user
-    * password  - **admin**                 # Password of the core system admin user
     * space
       * name    - **My Space**              # Name of the space to create
-  * bridgehub
-    * username - **admin**                  # Name of the bridgehub admin user
-    * password - **admin**                  # Password of the bridgehub admin user
-  * filehub
-    * username - **admin**                  # Name of the filehub admin user
-    * password - **admin**                  # Password of the filehub admin user
   * task
     * license                               # Full content of the license
     * username - **admin**                  # Name of the task configurator admin user
@@ -93,19 +85,9 @@ curl -X POST \
     "log_level": "info",
     "components": {
       "core": {
-        "username": "admin",
-        "password": "admin",
         "space": {
           "name": "My Space"
         }
-      },
-      "bridgehub": {
-        "username": "admin",
-        "password": "admin"
-      },
-      "filehub": {
-        "username": "admin",
-        "password": "admin"
       },
       "task": {
         "license": null,
@@ -135,22 +117,6 @@ The following properties must be provided to the tenant data manager when decomm
 * host -       **https://kinops-test.io**   # the URL of the core server
 * subdomains - **true**                     # whether subdomains are used for tenant spaces
 * log_level -  **info**                     # SDK log level passed to templates scripts
-* components                                # Map of platform component configurations
-  * core
-    * username  - **admin**                 # Name of the core system admin user
-    * password  - **admin**                 # Password of the core system admin user
-  * bridgehub
-    * username - **admin**                  # Name of the bridgehub admin user
-    * password - **admin**                  # Password of the bridgehub admin user
-  * filehub
-    * username - **admin**                  # Name of the filehub admin user
-    * password - **admin**                  # Password of the filehub admin user
-  * task
-    * username - **admin**                  # Name of the task configurator admin user
-    * password - **KINETIC_TASK_CONFIGURATOR_PASSWORD** # Environment variable name for the task configurator admin password
-    * container
-      * image - **kineticdata/task**        # Name of the docker image to use for Kinetic Task
-      * tag - **4.4.0**            # Tag of the docker image to use for Kinetic Task
 
 #### cURL example to decommission tenant
 
@@ -164,29 +130,7 @@ curl -X POST \
     "slug": "my-space",
     "host": "https://kinops-test.io",
     "subdomains" :true,
-    "log_level": "info",
-    "components": {
-      "core": {
-        "username": "admin",
-        "password": "admin"
-      },
-      "bridgehub": {
-        "username": "admin",
-        "password": "admin"
-      },
-      "filehub": {
-        "username": "admin",
-        "password": "admin"
-      },
-      "task": {
-        "username": "admin",
-        "password": "KINETIC_TASK_CONFIGURATOR_PASSWORD",
-        "container": {
-          "image": "kineticdata/task",
-          "tag": "4.4.0"
-        }
-      }
-    }
+    "log_level": "info"
   }'
 ```
 
@@ -200,15 +144,6 @@ The following properties must be provided to the tenant data manager when repair
 * subdomains - **true**                     # whether subdomains are used for tenant spaces
 * log_level -  **info**                     # SDK log level passed to templates scripts
 * components                                # Map of platform component configurations
-  * core
-    * username  - **admin**                 # Name of the core system admin user
-    * password  - **admin**                 # Password of the core system admin user
-  * bridgehub
-    * username - **admin**                  # Name of the bridgehub admin user
-    * password - **admin**                  # Password of the bridgehub admin user
-  * filehub
-    * username - **admin**                  # Name of the filehub admin user
-    * password - **admin**                  # Password of the filehub admin user
   * task
     * username - **admin**                  # Name of the task configurator admin user
     * password - **KINETIC_TASK_CONFIGURATOR_PASSWORD** # Environment variable name for the task configurator admin password
@@ -235,18 +170,6 @@ curl -X POST \
     "subdomains" :true,
     "log_level": "info",
     "components": {
-      "core": {
-        "username": "admin",
-        "password": "admin"
-      },
-      "bridgehub": {
-        "username": "admin",
-        "password": "admin"
-      },
-      "filehub": {
-        "username": "admin",
-        "password": "admin"
-      },
       "task": {
         "username": "admin",
         "password": "KINETIC_TASK_CONFIGURATOR_PASSWORD",
@@ -274,13 +197,6 @@ The following properties must be provided to the tenant data manager when uninst
 * host -       **https://kinops-test.io**   # the URL of the core server
 * subdomains - **true**                     # whether subdomains are used for tenant spaces
 * log_level -  **info**                     # SDK log level passed to templates scripts
-* components                                # Map of platform component configurations
-  * task
-    * username - **admin**                  # Name of the task configurator admin user
-    * password - **KINETIC_TASK_CONFIGURATOR_PASSWORD** # Environment variable name for the task configurator admin password
-    * container
-      * image - **kineticdata/task**        # Name of the docker image to use for Kinetic Task
-      * tag - **4.4.0**            # Tag of the docker image to use for Kinetic Task
 
 #### cURL example to uninstall tenant
 
@@ -294,17 +210,7 @@ curl -X POST \
     "slug": "my-space",
     "host": "https://kinops-test.io",
     "subdomains" :true,
-    "log_level": "info",
-    "components": {
-      "task": {
-        "username": "admin",
-        "password": "KINETIC_TASK_CONFIGURATOR_PASSWORD",
-        "container": {
-          "image": "kineticdata/task",
-          "tag": "4.4.0"
-        }
-      }
-    }
+    "log_level": "info"
   }'
 ```
 
@@ -318,15 +224,6 @@ The following properties must be provided to the tenant data manager when upgrad
 * subdomains - **true**                     # whether subdomains are used for tenant spaces
 * log_level -  **info**                     # SDK log level passed to templates scripts
 * components                                # Map of platform component configurations
-  * core
-    * username  - **admin**                 # Name of the core system admin user
-    * password  - **admin**                 # Password of the core system admin user
-  * bridgehub
-    * username - **admin**                  # Name of the bridgehub admin user
-    * password - **admin**                  # Password of the bridgehub admin user
-  * filehub
-    * username - **admin**                  # Name of the filehub admin user
-    * password - **admin**                  # Password of the filehub admin user
   * task
     * username - **admin**                  # Name of the task configurator admin user
     * password - **KINETIC_TASK_CONFIGURATOR_PASSWORD** # Environment variable name for the task configurator admin password
@@ -353,18 +250,6 @@ curl -X POST \
     "subdomains" :true,
     "log_level": "info",
     "components": {
-      "core": {
-        "username": "admin",
-        "password": "admin"
-      },
-      "bridgehub": {
-        "username": "admin",
-        "password": "admin"
-      },
-      "filehub": {
-        "username": "admin",
-        "password": "admin"
-      },
       "task": {
         "username": "admin",
         "password": "KINETIC_TASK_CONFIGURATOR_PASSWORD",

@@ -263,7 +263,7 @@ module Kinetic
             tries = tries + 1
             Kinetic::Platform.logger.info "Try #{tries}, checking task status at #{url}"
             http = Http.new
-            res = http.get(url, {}, http.default_headers)
+            res = http.get(url, {}, {})
             if res.status == 200
               Kinetic::Platform.logger.info "  #{res.status}: task is running"
               task_is_running = true
@@ -283,6 +283,15 @@ module Kinetic
 
             # Get the task password from the secret store
             @task.password=Kinetic::Platform::Kubernetes.decode_space_secret(@task.password_key, @task.space_slug)
+
+            # add the task license
+            if !@task.license.nil?
+              Kinetic::Platform.logger.info "Importing the #{@core.space_name} task license"
+              http = Http.new(@task.username, @task.password)
+              payload = { "licenseContent" => @task.license }
+              url = "#{@task.api_v2}/config/license"
+              res = http.post(url, payload, http.default_headers)
+            end
 
             http = Http.new(@task.username, @task.password)
             payload = {
@@ -329,16 +338,7 @@ module Kinetic
           Kinetic::Platform.logger.info "POST #{url} - #{res.status}: #{res.message}"
         end
 
-        # import the task license
-        if !@task.license.nil?
-            Kinetic::Platform.logger.info "Importing the #{@core.space_name} task license"
-            http = Http.new(@task.username, @task.password)
-            payload = { "licenseContent" => @task.license }
-            url = "#{@task.api_v2}/config/license"
-            res = http.post(url, payload, http.default_headers)
-        end
 
-        
         # process each of the templates
         @templates.each do |template|
           template.install
