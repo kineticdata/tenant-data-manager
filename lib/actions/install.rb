@@ -345,8 +345,8 @@ module Kinetic
             }
             Kinetic::Platform.logger.info "Running #{template.script} in the #{template.name}:#{template.version} repository."
             Kinetic::Platform.logger.info "  #{template.script_path}"
-            Kinetic::Platform.logger.info "Script Data: "
-            Kinetic::Platform.logger.info "  #{script_variables.to_json}"
+            # Kinetic::Platform.logger.info "Script Data: "
+            # Kinetic::Platform.logger.info "  #{script_variables.to_json}"
 
             system("ruby", template.script_path, script_variables.to_json)
           else
