@@ -48,6 +48,7 @@ module Kinetic
           Kinetic::Platform.logger.info msg
         end
 
+        Kinetic::Platform.logger.info "#{ACTION} space #{@core.space_slug} complete"
         "#{ACTION} complete"
       end
       

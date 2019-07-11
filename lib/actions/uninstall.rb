@@ -22,6 +22,7 @@ module Kinetic
         # Don't think there is a way to do this currently
         Kinetic::Platform.logger.info "Deleting the files in the filestore for space #{@filehub.space_slug}"
 
+        Kinetic::Platform.logger.info "#{ACTION} space #{@core.space_slug} complete"
         "#{ACTION} complete"
       end
 

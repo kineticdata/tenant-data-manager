@@ -34,6 +34,7 @@ module Kinetic
         url = "#{@core.system_api}/spaces/#{@core.space_slug}"
         http.delete(url, http.default_headers)
 
+        Kinetic::Platform.logger.info "#{ACTION} space #{@core.space_slug} complete"
         "#{ACTION} complete"
       end
 

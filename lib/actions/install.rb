@@ -353,6 +353,8 @@ module Kinetic
             Kinetic::Platform.logger.warn "Skipping #{ACTION} action of #{template.name}:#{template.version} because the #{template.script_path} file doesn't exist."
           end
         end
+        
+        Kinetic::Platform.logger.info "#{ACTION} space #{@core.space_slug} complete"
         "#{ACTION} complete"
       end
       
