@@ -1,5 +1,6 @@
 FROM ruby:2.5-alpine
 RUN apk --no-cache add \
+    alpine-sdk \
     bash \
     curl \
     git \
@@ -20,5 +21,5 @@ RUN bundle install && bundle clean
 
 EXPOSE 4567
 
-ENTRYPOINT ["ruby"]
-CMD ["app.rb"]
+ENTRYPOINT ["puma"]
+CMD ["config.ru", "-C", "puma.rb"]
