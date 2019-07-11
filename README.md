@@ -68,7 +68,15 @@ The following properties must be provided to the tenant data manager when instal
   * url - **https://github.com/kineticdata/platform-template-base.git** # URL of the template repository in GitHub
   * branch | tag | commit - **develop**     # Git branch name, tag name, or commit hash
   * script - **install.rb**                 # Optional name of script to run in the template, default: `#{action}.rb`
-  * script-args - **{}**                   # Optional arguments passed to the template script, default: `{}`
+  * script-args - **{}**                    # Optional arguments passed to the template script, default: `{}`
+* templateData
+  * users
+    * username: joe.user
+      email: joe.user@example.com
+      attributes: []
+    * username: jane.user
+* templateDataSecrets
+  * key: name-of-secrets-file
 
 #### cURL example to install tenant
 
@@ -81,7 +89,6 @@ curl -X POST \
     "action": "install",
     "slug": "my-space",
     "host": "https://kinops-test.io",
-    "subdomains" :true,
     "log_level": "info",
     "components": {
       "core": {
@@ -91,8 +98,6 @@ curl -X POST \
       },
       "task": {
         "license": null,
-        "username": "admin",
-        "password": "KINETIC_TASK_CONFIGURATOR_PASSWORD",
         "container": {
           "image": "kineticdata/task",
           "tag": "4.4.0"
@@ -104,7 +109,13 @@ curl -X POST \
         "url": "https://github.com/kineticdata/platform-template-base.git",
         "branch":"develop"
       }
-    ]
+    ],
+    "templateData": {
+      "users": []
+    },
+    "templateDataSecrets": {
+      "smtp": "smtp-default"
+    }
   }'
 ```
 

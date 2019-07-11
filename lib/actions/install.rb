@@ -35,29 +35,6 @@ module Kinetic
           end
         end
 
-        # set the admin user credentials that will be created in all
-        # spaces
-        # TODO: move username to secrets or values.yaml
-        # TODO: move password to secrets
-        admin_username = "kdadmin"
-        admin_password = "admin"
-
-        # set the service user credentials that will be used by the
-        # applications where needed to communitcate with each other
-        # TODO: move username and email to secrets or values.yaml
-        service_user_username = "integration-user"
-        service_user_password = Kinetic::Platform::Random.simple(24)
-        service_user_email    = "wally@kinops.io"
-
-        # update the credentials in each application that utilizes
-        # the service user
-        @bridgehub.service_user_username  = service_user_username
-        @bridgehub.service_user_password  = service_user_password
-        @core.service_user_username       = service_user_username
-        @core.service_user_password       = service_user_password
-        @task.service_user_username       = service_user_username
-        @task.service_user_password       = service_user_password
-
         # create the space using the system api
         Kinetic::Platform.logger.info "Creating the #{@core.space_name} space with slug #{@core.space_slug}"
         http = Http.new(@core.username, @core.password)
@@ -110,11 +87,21 @@ module Kinetic
           return
         end
 
+        # set the admin user credentials that will be created in all spaces
+        admin_username = "kdadmin"
 
-        # create the datastore submission in the environment datastore
-            # store the TaskImage:Tag property as a submission value
-            # currently this is passed in from the values.yaml file
+        # set the service user credentials that will be used by the
+        # applications where needed to communicate with each other
+        service_user_username = "integration-user"
+        service_user_password = Kinetic::Platform::Kubernetes.decode_space_secret(@core.space_slug, @core.service_user_password_key)
 
+        # update the credentials in each application that utilizes the service user
+        @bridgehub.service_user_username  = service_user_username
+        @bridgehub.service_user_password  = service_user_password
+        @core.service_user_username       = service_user_username
+        @core.service_user_password       = service_user_password
+        @task.service_user_username       = service_user_username
+        @task.service_user_password       = service_user_password
 
         # create the common space admin user using the system api
         Kinetic::Platform.logger.info "Creating user #{admin_username}"
@@ -122,7 +109,7 @@ module Kinetic
         payload = {
           "space_slug" => @core.space_slug,
           "username" => admin_username,
-          "password" => admin_password,
+          "password" => Kinetic::Platform::Random.simple(24),
           "enabled" => true,
           "spaceAdmin" => true
         }
@@ -137,7 +124,6 @@ module Kinetic
           "space_slug" => @core.space_slug,
           "username" => service_user_username,
           "password" => service_user_password,
-          "email" => service_user_email,
           "enabled" => true,
           "spaceAdmin" => true
         }
@@ -282,7 +268,7 @@ module Kinetic
             Kinetic::Platform.logger.info "Updating the #{@core.space_name} space task identity store to use core"
 
             # Get the task password from the secret store
-            @task.password=Kinetic::Platform::Kubernetes.decode_space_secret(@task.password_key, @task.space_slug)
+            @task.password=Kinetic::Platform::Kubernetes.decode_space_secret(@task.space_slug, @task.password_key)
 
             # add the task license
             if !@task.license.nil?
@@ -338,20 +324,30 @@ module Kinetic
           Kinetic::Platform.logger.info "POST #{url} - #{res.status}: #{res.message}"
         end
 
+        # decode any template data secrets
+        @template_data_secrets.each do |key, secrets_file|
+          @template_data = @template_data.merge({
+            key => Kinetic::Platform::Kubernetes.decode_secrets_file(secrets_file)
+          })
+        end
 
         # process each of the templates
         @templates.each do |template|
           template.install
           if File.readable?(template.script_path)
-            Kinetic::Platform.logger.info "Running #{template.script} in the #{template.name}:#{template.version} repository."
-            Kinetic::Platform.logger.info "  #{template.script_path}"
             script_variables = {
               "bridgehub" => @bridgehub.template_bindings,
               "core" => @core.template_bindings,
               "discussions" => @discussions.template_bindings,
               "filehub" => @filehub.template_bindings,
-              "task" => @task.template_bindings
+              "task" => @task.template_bindings,
+              "data" => @template_data
             }
+            Kinetic::Platform.logger.info "Running #{template.script} in the #{template.name}:#{template.version} repository."
+            Kinetic::Platform.logger.info "  #{template.script_path}"
+            Kinetic::Platform.logger.info "Script Data: "
+            Kinetic::Platform.logger.info "  #{script_variables.to_json}"
+
             system("ruby", template.script_path, script_variables.to_json)
           else
             Kinetic::Platform.logger.warn "Skipping #{ACTION} action of #{template.name}:#{template.version} because the #{template.script_path} file doesn't exist."

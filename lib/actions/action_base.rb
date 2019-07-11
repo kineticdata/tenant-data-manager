@@ -2,8 +2,10 @@ module Kinetic
   module Platform
     class ActionBase
 
-      attr_reader :action, :slug, :log_level, :templates,
+      attr_reader :action, :slug, :log_level, :templates, :template_data_secrets,
                   :bridgehub, :core, :discussions, :filehub, :task
+
+      attr_accessor :template_data
       
       INSTALL      = "install"
       REPAIR       = "repair"
@@ -17,11 +19,17 @@ module Kinetic
         begin
           @action = options["action"]
           @slug = options["slug"]
-          @subdomains = options["subdomains"].to_s.strip.downcase == "true"
+          @subdomains = options["subdomains"].nil? ? true : 
+              options["subdomains"].to_s.strip.downcase == "true"
           @log_level = options["log_level"] || "off"
           @host = options["host"]
           @component_metadata = options["components"] || {}
           @template_metadata = options["templates"] || []
+
+          # read template data
+          @template_data = options["templateData"] || {}
+          @template_data_secrets = options["templateDataSecrets"] || {}
+
           # validate the arguments
           validate
         rescue Exception => e
@@ -71,8 +79,8 @@ module Kinetic
           "space_slug" => @slug,
           "subdomains" => @subdomains,
           "log_level" => @log_level,
-          "username" => Kinetic::Platform::Kubernetes.decode_secret("system_username", "shared-secrets", "kinetic"),
-          "password" => Kinetic::Platform::Kubernetes.decode_secret("system_password", "shared-secrets", "kinetic")
+          "username" => Kinetic::Platform::Kubernetes.decode_secret("shared-secrets", "system_username"),
+          "password" => Kinetic::Platform::Kubernetes.decode_secret("shared-secrets", "system_password")
         }
 
         # Create the components if they were defined in the passed in data

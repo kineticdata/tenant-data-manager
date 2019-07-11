@@ -3,9 +3,11 @@ module Kinetic
     class Core
   
       attr_reader :host, :subdomains, :username, :password, :space_name,
-                  :log_level
+                  :log_level, :service_user_password_key
 
       attr_accessor :space_slug, :service_user_username, :service_user_password
+
+      SERVICE_USER_PASSWORD_KEY = "INTEGRATION_USER_PASSWORD"
 
       def initialize(options)
         @host = options["host"]
@@ -14,6 +16,8 @@ module Kinetic
         @space_slug = options["space_slug"]
         @username = options["username"] || "admin"
         @password = options["password"] || "admin"
+        @service_user_password_key = SERVICE_USER_PASSWORD_KEY
+
 
         space = options["space"] || {}
         @space_name = space["name"] || @space_slug

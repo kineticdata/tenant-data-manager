@@ -11,13 +11,16 @@ module Kinetic
       DEFAULT_CONTAINER_IMAGE = "kineticdata/kinetic-task"
       DEFAULT_CONTAINER_TAG   = "latest"
 
+      CONFIGURATOR_USERNAME = "admin"
+      CONFIGURATOR_PASSWORD_KEY = "KINETIC_TASK_CONFIGURATOR_PASSWORD"
+
       def initialize(options)
         @host = options["host"]
         @subdomains = options["subdomains"]
         @log_level = options["log_level"]
         @space_slug = options["space_slug"]
-        @username = options["username"] || "admin"
-        @password_key = options["password"]
+        @username = CONFIGURATOR_USERNAME
+        @password_key = CONFIGURATOR_PASSWORD_KEY
         @license = options["license"]
 
         container = options["container"] || {}
@@ -46,7 +49,7 @@ module Kinetic
       end
 
       def deployer_api
-        "http://tenant-infrastructure-manager"
+        "https://tenant-infrastructure-manager"
       end
 
       def template_bindings
