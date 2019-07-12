@@ -46,6 +46,10 @@ module Kinetic
         raise StandardError.new "Not Implemented"
       end
 
+      def duration(start, finish=Time.now)
+        "%.3f sec" % (finish-start)
+      end
+
 
       private
 

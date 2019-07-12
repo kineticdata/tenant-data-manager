@@ -9,6 +9,8 @@ module Kinetic
       end
 
       def execute
+        timing_start = Time.now
+
         # if the space slug was not provided
         if @core.space_slug.nil?
           # keep generating a space slug until an unused one is found
@@ -344,8 +346,9 @@ module Kinetic
           end
         end
         
-        Kinetic::Platform.logger.info "#{ACTION} space #{@core.space_slug} complete"
-        "#{ACTION} complete"
+        duration = duration(timing_start)
+        Kinetic::Platform.logger.info "#{ACTION} space #{@core.space_slug} complete (#{duration})"
+        "#{ACTION} complete (#{duration})"
       end
       
     end

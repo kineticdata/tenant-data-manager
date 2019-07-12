@@ -9,6 +9,8 @@ module Kinetic
       end
 
       def execute
+        timing_start = Time.now
+
         @task.image = "look up from space datastore record or attribute"
 
         # 1 - check if space slug exists
@@ -48,8 +50,10 @@ module Kinetic
           Kinetic::Platform.logger.info msg
         end
 
-        Kinetic::Platform.logger.info "#{ACTION} space #{@core.space_slug} complete"
-        "#{ACTION} complete"
+
+        duration = duration(timing_start)
+        Kinetic::Platform.logger.info "#{ACTION} space #{@core.space_slug} complete (#{duration})"
+        "#{ACTION} complete (#{duration})"
       end
       
     end

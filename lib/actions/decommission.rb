@@ -9,6 +9,8 @@ module Kinetic
       end
 
       def execute
+        timing_start = Time.now
+
         # 1 - remove the task tenant
         Kinetic::Platform.logger.info "Deleting the task container for space #{@task.space_slug}"
         http = Http.new
@@ -34,8 +36,10 @@ module Kinetic
         url = "#{@core.system_api}/spaces/#{@core.space_slug}"
         http.delete(url, http.default_headers)
 
-        Kinetic::Platform.logger.info "#{ACTION} space #{@core.space_slug} complete"
-        "#{ACTION} complete"
+
+        duration = duration(timing_start)
+        Kinetic::Platform.logger.info "#{ACTION} space #{@core.space_slug} complete (#{duration})"
+        "#{ACTION} complete (#{duration})"
       end
 
     end

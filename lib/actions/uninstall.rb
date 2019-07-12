@@ -9,6 +9,8 @@ module Kinetic
       end
 
       def execute
+        timing_start = Time.now
+
         Kinetic::Platform.logger.info "Deleting the task database for space #{@task.space_slug}"
         http = Http.new
         payload = { "tenant" => @task.space_slug }
@@ -22,8 +24,10 @@ module Kinetic
         # Don't think there is a way to do this currently
         Kinetic::Platform.logger.info "Deleting the files in the filestore for space #{@filehub.space_slug}"
 
-        Kinetic::Platform.logger.info "#{ACTION} space #{@core.space_slug} complete"
-        "#{ACTION} complete"
+
+        duration = duration(timing_start)
+        Kinetic::Platform.logger.info "#{ACTION} space #{@core.space_slug} complete (#{duration})"
+        "#{ACTION} complete (#{duration})"
       end
 
     end
