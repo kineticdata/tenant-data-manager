@@ -2,7 +2,7 @@ module Kinetic
   module Platform
     class ActionBase
 
-      attr_reader :action, :slug, :log_level, :templates, :template_data_secrets,
+      attr_reader :action, :slug, :log_level, :templates,
                   :bridgehub, :core, :discussions, :filehub, :task
 
       attr_accessor :template_data
@@ -26,9 +26,13 @@ module Kinetic
           @component_metadata = options["components"] || {}
           @template_metadata = options["templates"] || []
 
-          # read template data
-          @template_data = options["templateData"] || {}
-          @template_data_secrets = options["templateDataSecrets"] || {}
+          # build the extra data to send to templates
+          # add decoded template data secrets first, then merge in the rest of the
+          # template data to allow overwriting values that were provided as stored secrets
+          @template_data = (options["templateDataSecrets"] || {}).each_with_object({}) do |(key,secrets_file),result|
+            result[key] = Kinetic::Platform::Kubernetes.decode_secrets_file(secrets_file)
+          end
+          @template_data.merge!(options["templateData"] || {})
 
           # validate the arguments
           validate

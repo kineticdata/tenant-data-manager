@@ -323,13 +323,6 @@ module Kinetic
           Kinetic::Platform.logger.info "POST #{url} - #{res.status}: #{res.message}"
         end
 
-        # decode any template data secrets
-        @template_data_secrets.each do |key, secrets_file|
-          @template_data = @template_data.merge({
-            key => Kinetic::Platform::Kubernetes.decode_secrets_file(secrets_file)
-          })
-        end
-
         # process each of the templates
         @templates.each do |template|
           template.install
@@ -344,8 +337,6 @@ module Kinetic
             }
             Kinetic::Platform.logger.info "Running #{template.script} in the #{template.name}:#{template.version} repository."
             Kinetic::Platform.logger.info "  #{template.script_path}"
-            # Kinetic::Platform.logger.info "Script Data: "
-            # Kinetic::Platform.logger.info "  #{script_variables.to_json}"
 
             system("ruby", template.script_path, script_variables.to_json)
           else
