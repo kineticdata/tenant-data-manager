@@ -50,11 +50,10 @@ module Kinetic
         # deploy space task application
         Kinetic::Platform.logger.info "Deploying the #{@core.space_name} space task application"
         http = Http.new
-        payload = { 
-          "tenant" => @core.space_slug,
-          "image" => @task.image,
-          "tag" => @task.tag
-        }
+        payload = { "tenant" => @core.space_slug }
+        payload["image"] = @task.image if !@task.image.nil?
+        payload["tag"] = @task.tag if !@task.tag.nil?
+
         url = "#{@task.deployer_api}/newTenant"
         res = http.post(url, payload, http.json_headers)
         if res.status != 200

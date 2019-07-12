@@ -8,9 +8,6 @@ module Kinetic
       attr_accessor :space_slug, :image, :tag, :password,
                     :service_user_username, :service_user_password
 
-      DEFAULT_CONTAINER_IMAGE = "kineticdata/kinetic-task"
-      DEFAULT_CONTAINER_TAG   = "latest"
-
       CONFIGURATOR_USERNAME = "admin"
       CONFIGURATOR_PASSWORD_KEY = "KINETIC_TASK_CONFIGURATOR_PASSWORD"
 
@@ -24,8 +21,8 @@ module Kinetic
         @license = options["license"]
 
         container = options["container"] || {}
-        @image = container["image"] || DEFAULT_CONTAINER_IMAGE
-        @tag = container["tag"] || DEFAULT_CONTAINER_TAG
+        @image = container["image"]
+        @tag = container["tag"]
 
         @password = nil
         @service_user_username = nil
