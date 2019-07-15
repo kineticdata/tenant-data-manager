@@ -12,7 +12,7 @@ module Kinetic
         timing_start = Time.now
 
         Kinetic::Platform.logger.info "Deleting the task database for space #{@task.space_slug}"
-        http = Http.new(nil, nil, @http_options)
+        http = Http.new(nil, nil, @internal_http_options)
         payload = { "tenant" => @task.space_slug }
         url = "#{@task.deployer_api}/deleteTenantDb"
         res = http.post(url, payload, http.json_headers)

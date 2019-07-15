@@ -31,7 +31,7 @@ module Kinetic
             :ssl_verify_mode => http_options["ssl_verify_mode"] || "peer"
           }
           @internal_http_options = {
-            :log_level => "debug",
+            :log_level => "trace",
             :ssl_ca_file => "/app/cert/tls.crt",
             :ssl_verify_mode => "peer"
           }

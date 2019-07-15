@@ -13,7 +13,7 @@ module Kinetic
 
         # 1 - remove the task tenant
         Kinetic::Platform.logger.info "Deleting the task container for space #{@task.space_slug}"
-        http = Http.new(nil, nil, @http_options)
+        http = Http.new(nil, nil, @internal_http_options)
         payload = { "tenant" => @task.space_slug }
         url = "#{@task.deployer_api}/deleteTenant"
         res = http.post(url, payload, http.json_headers)
