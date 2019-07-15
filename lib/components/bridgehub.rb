@@ -2,14 +2,13 @@ module Kinetic
   module Platform
     class Bridgehub
 
-      attr_reader :host, :username, :password, :log_level
+      attr_reader :host, :username, :password
 
       attr_accessor :space_slug, :access_key_id, :access_key_secret,
                     :service_user_username, :service_user_password
       
       def initialize(options)
         @host = options["host"]
-        @log_level = options["log_level"]
         @subdomains = options["subdomains"]
         @space_slug = options["space_slug"]
         @username = options["username"] || "admin"
@@ -42,7 +41,6 @@ module Kinetic
       def template_bindings
         {
           "api" => api,
-          "log_level" => @log_level,
           "server" => server,
           "space_slug" => @space_slug,
           "bridges" => {

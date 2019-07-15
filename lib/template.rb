@@ -69,7 +69,7 @@ module Kinetic
                         "#{@name}-#{@version}" : "#{@name}-#{Time.now.to_i}"
         @script = options["script"] || "#{action}.rb"
         @script_path = File.join(templates_path, @install_dir, @script)
-        @script_args = (options["script-args"] || {}).to_json
+        @script_args = options["script-args"] || {}
       end
 
       # When using a branch, the repository will always be cloned into a 

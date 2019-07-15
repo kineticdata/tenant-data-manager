@@ -15,7 +15,7 @@ module Kinetic
 
         # 1 - check if space slug exists
         Kinetic::Platform.logger.info "Checking if the #{@core.space_slug} space slug exists"
-        http = Http.new(@core.username, @core.password)
+        http = Http.new(@core.username, @core.password, @http_options)
         res = http.get("#{@core.system_api}/spaces/#{@core.space_slug}",
           {}, http.default_headers)
 
@@ -29,13 +29,13 @@ module Kinetic
             if File.readable?(template.script_path)
               Kinetic::Platform.logger.warn "Running #{template.script} in the #{template.name}:#{template.version} repository."
               Kinetic::Platform.logger.warn "  #{template.script_path}"
-              script_variables = {
+              script_variables = script_data({
                 "bridgehub" => @bridgehub.template_bindings,
                 "core" => @core.template_bindings,
                 "discussions" => @discussions.template_bindings,
                 "filehub" => @filehub.template_bindings,
                 "task" => @task.template_bindings
-              }
+              }, template.script_args)
               system("ruby", template.script_path, script_variables.to_json)
             else
               Kinetic::Platform.logger.warn "Skipping #{ACTION} action of #{template.name}:#{template.version} because the #{template.script} file doesn't exist."

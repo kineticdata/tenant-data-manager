@@ -3,14 +3,13 @@ module Kinetic
     class Discussions
 
       attr_reader :host, :subdomains,
-                  :oauth_client_id, :oauth_client_secret, :log_level
+                  :oauth_client_id, :oauth_client_secret
       
       attr_accessor :space_slug
       
       def initialize(options)
         @host = options["host"]
         @subdomains = options["subdomains"]
-        @log_level = options["log_level"]
         @space_slug = options["space_slug"]
 
         oauth_client = options["oauth-client"] || {}
@@ -33,7 +32,6 @@ module Kinetic
       def template_bindings
         {
           "api" => api,
-          "log_level" => @log_level,
           "server" => server,
           "space_slug" => @space_slug
         }

@@ -2,8 +2,7 @@ module Kinetic
   module Platform
     class Task
     
-      attr_reader :host, :subdomains, :username, :password_key, :license,
-                  :log_level
+      attr_reader :host, :subdomains, :username, :password_key, :license
 
       attr_accessor :space_slug, :image, :tag, :password,
                     :service_user_username, :service_user_password
@@ -14,7 +13,6 @@ module Kinetic
       def initialize(options)
         @host = options["host"]
         @subdomains = options["subdomains"]
-        @log_level = options["log_level"]
         @space_slug = options["space_slug"]
         @username = CONFIGURATOR_USERNAME
         @password_key = CONFIGURATOR_PASSWORD_KEY
@@ -46,14 +44,13 @@ module Kinetic
       end
 
       def deployer_api
-        "https://tenant-infrastructure-manager"
+        "https://tenant-infrastructure-manager.kinetic.svc.cluster.local"
       end
 
       def template_bindings
         {
           "api" => api,
           "api_v2" => api_v2,
-          "log_level" => @log_level,
           "server" => server,
           "space_slug" => @space_slug,
           "username" => @username,

@@ -3,7 +3,7 @@ module Kinetic
     class Core
   
       attr_reader :host, :subdomains, :username, :password, :space_name,
-                  :log_level, :service_user_password_key
+                  :service_user_password_key
 
       attr_accessor :space_slug, :service_user_username, :service_user_password
 
@@ -11,13 +11,11 @@ module Kinetic
 
       def initialize(options)
         @host = options["host"]
-        @log_level = options["log_level"]
         @subdomains = options["subdomains"]
         @space_slug = options["space_slug"]
         @username = options["username"] || "admin"
         @password = options["password"] || "admin"
         @service_user_password_key = SERVICE_USER_PASSWORD_KEY
-
 
         space = options["space"] || {}
         @space_name = space["name"] || @space_slug
@@ -45,7 +43,6 @@ module Kinetic
       def template_bindings
         {
           "api" => api,
-          "log_level" => @log_level,
           "server" => server,
           "space_slug" => @space_slug,
           "space_name" => @space_name,

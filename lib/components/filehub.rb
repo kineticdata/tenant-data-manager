@@ -2,7 +2,7 @@ module Kinetic
   module Platform
     class Filehub
 
-      attr_reader :host, :username, :password, :log_level,
+      attr_reader :host, :username, :password,
                   :adapter_class, :adapter_properties
 
       attr_accessor :space_slug, :access_key_id, :access_key_secret
@@ -10,7 +10,6 @@ module Kinetic
       def initialize(options)
         @host = options["host"]
         @subdomains = options["subdomains"]
-        @log_level = options["log_level"]
         @space_slug = options["space_slug"]
         @username = options["username"] || "admin"
         @password = options["password"] || "admin"
@@ -60,7 +59,6 @@ module Kinetic
       def template_bindings
         {
           "api" => api,
-          "log_level" => @log_level,
           "server" => server,
           "space_slug" => @space_slug,
           "filestores" => {

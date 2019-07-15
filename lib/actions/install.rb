@@ -39,7 +39,7 @@ module Kinetic
 
         # create the space using the system api
         Kinetic::Platform.logger.info "Creating the #{@core.space_name} space with slug #{@core.space_slug}"
-        http = Http.new(@core.username, @core.password)
+        http = Http.new(@core.username, @core.password, @http_options)
         payload = { "name" => @core.space_name, "slug" => @core.space_slug }
         url = "#{@core.system_api}/spaces"
         res = http.post(url, payload, http.default_headers)
@@ -51,7 +51,7 @@ module Kinetic
 
         # deploy space task application
         Kinetic::Platform.logger.info "Deploying the #{@core.space_name} space task application"
-        http = Http.new
+        http = Http.new(nil, nil, @internal_http_options)
         payload = { "tenant" => @core.space_slug }
         payload["image"] = @task.image if !@task.image.nil?
         payload["tag"] = @task.tag if !@task.tag.nil?
@@ -70,7 +70,7 @@ module Kinetic
         loop do
           tries = tries + 1
           Kinetic::Platform.logger.info "Try #{tries}, checking space subdomain at #{url}"
-          http = Http.new
+          http = Http.new(nil, nil, @http_options)
           res = http.get(url, {}, http.default_headers)
           if res.status == 200
             Kinetic::Platform.logger.info "  #{res.status}: space subdomain is ready"
@@ -106,7 +106,7 @@ module Kinetic
 
         # create the common space admin user using the system api
         Kinetic::Platform.logger.info "Creating user #{admin_username}"
-        http = Http.new(@core.username, @core.password)
+        http = Http.new(@core.username, @core.password, @http_options)
         payload = {
           "space_slug" => @core.space_slug,
           "username" => admin_username,
@@ -120,7 +120,7 @@ module Kinetic
 
         # create the space specific service user using the system api
         Kinetic::Platform.logger.info "Creating user #{service_user_username}"
-        http = Http.new(@core.username, @core.password)
+        http = Http.new(@core.username, @core.password, @http_options)
         payload = {
           "space_slug" => @core.space_slug,
           "username" => service_user_username,
@@ -138,7 +138,7 @@ module Kinetic
 
         # create Kinetic Core bridge
         Kinetic::Platform.logger.info "Creating the #{@bridgehub.bridge_slug} bridge"
-        http = Http.new(@bridgehub.username, @bridgehub.password)
+        http = Http.new(@bridgehub.username, @bridgehub.password, @http_options)
         bridge_name = "#{@core.space_slug} - #{@core.space_name} - Kinetic Core"
         payload = {
           "adapterClass" => "com.kineticdata.bridgehub.adapter.kineticcore.KineticCoreAdapter",
@@ -179,7 +179,7 @@ module Kinetic
 
         # create filehub filestore
         Kinetic::Platform.logger.info "Creating the #{@filehub.filestore_slug} filestore"
-        http = Http.new(@filehub.username, @filehub.password)
+        http = Http.new(@filehub.username, @filehub.password, @http_options)
         payload = { 
           "name" => "#{@filehub.filestore_slug}",
           "slug" => @filehub.filestore_slug,
@@ -213,7 +213,7 @@ module Kinetic
 
         # create space oauth clients for the service user
         Kinetic::Platform.logger.info "Creating the #{@core.space_name} space oauth client for #{service_user_username}"
-        http = Http.new(service_user_username, service_user_password)
+        http = Http.new(service_user_username, service_user_password, @http_options)
         payload = {
           "name" => service_user_username,
           "description" => "OAuth client for #{service_user_username}",
@@ -231,7 +231,7 @@ module Kinetic
         Kinetic::Platform.logger.info "Creating the #{@core.space_name} space oauth client for task"
         oauth_id_task = "kinetic-task"
         oauth_secret_task = Kinetic::Platform::Random.simple(32)
-        http = Http.new(service_user_username, service_user_password)
+        http = Http.new(service_user_username, service_user_password, @http_options)
         payload = {
           "name" => "Kinetic Task",
           "description" => "OAuth client for Kinetic Task",
@@ -249,7 +249,7 @@ module Kinetic
           loop do
             tries = tries + 1
             Kinetic::Platform.logger.info "Try #{tries}, checking task status at #{url}"
-            http = Http.new
+            http = Http.new(nil, nil, @http_options)
             res = http.get(url, {}, {})
             if res.status == 200
               Kinetic::Platform.logger.info "  #{res.status}: task is running"
@@ -274,13 +274,13 @@ module Kinetic
             # add the task license
             if !@task.license.nil?
               Kinetic::Platform.logger.info "Importing the #{@core.space_name} task license"
-              http = Http.new(@task.username, @task.password)
+              http = Http.new(@task.username, @task.password, @http_options)
               payload = { "licenseContent" => @task.license }
               url = "#{@task.api_v2}/config/license"
               res = http.post(url, payload, http.default_headers)
             end
 
-            http = Http.new(@task.username, @task.password)
+            http = Http.new(@task.username, @task.password, @http_options)
             payload = {
               "Identity Store" => "com.kineticdata.authentication.kineticcore.KineticCoreIdentityStore",
               "properties" => {
@@ -294,7 +294,7 @@ module Kinetic
 
             # update task to use oauth
             Kinetic::Platform.logger.info "Updating the #{@core.space_name} task authentication to use oauth"
-            http = Http.new(@task.username, @task.password)
+            http = Http.new(@task.username, @task.password, @http_options)
             payload = {
               "authenticator" => "com.kineticdata.core.v1.authenticators.OAuthAuthenticator",
               "authenticationJsp" => "/WEB-INF/app/login.jsp",
@@ -329,14 +329,13 @@ module Kinetic
         @templates.each do |template|
           template.install
           if File.readable?(template.script_path)
-            script_variables = {
+            script_variables = script_data({
               "bridgehub" => @bridgehub.template_bindings,
               "core" => @core.template_bindings,
               "discussions" => @discussions.template_bindings,
               "filehub" => @filehub.template_bindings,
-              "task" => @task.template_bindings,
-              "data" => @template_data
-            }
+              "task" => @task.template_bindings
+            }, template.script_args)
             Kinetic::Platform.logger.info "Running #{template.script} in the #{template.name}:#{template.version} repository."
             Kinetic::Platform.logger.info "  #{template.script_path}"
 

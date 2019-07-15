@@ -2,11 +2,10 @@ module Kinetic
   module Platform
     class ActionBase
 
-      attr_reader :action, :slug, :log_level, :templates,
-                  :bridgehub, :core, :discussions, :filehub, :task
+      attr_reader :action, :slug, :templates,
+                  :bridgehub, :core, :discussions, :filehub, :task,
+                  :http_options, :internal_http_options, :template_data
 
-      attr_accessor :template_data
-      
       INSTALL      = "install"
       REPAIR       = "repair"
       UPGRADE      = "upgrade"
@@ -21,10 +20,21 @@ module Kinetic
           @slug = options["slug"]
           @subdomains = options["subdomains"].nil? ? true : 
               options["subdomains"].to_s.strip.downcase == "true"
-          @log_level = options["log_level"] || "off"
           @host = options["host"]
           @component_metadata = options["components"] || {}
           @template_metadata = options["templates"] || []
+
+          http_options = options["http_options"] || {}
+          @http_options = {
+            :log_level => http_options["log_level"] || "off",
+            :ssl_ca_file => http_options["ssl_ca_file"] || "/etc/ssl/ca.crt",
+            :ssl_verify_mode => http_options["ssl_verify_mode"] || "peer"
+          }
+          @internal_http_options = {
+            :log_level => "debug",
+            :ssl_ca_file => "/app/cert/tls.crt",
+            :ssl_verify_mode => "peer"
+          }
 
           # build the extra data to send to templates
           # add decoded template data secrets first, then merge in the rest of the
@@ -86,9 +96,9 @@ module Kinetic
           "host"     => @host,
           "space_slug" => @slug,
           "subdomains" => @subdomains,
-          "log_level" => @log_level,
           "username" => Kinetic::Platform::Kubernetes.decode_secret("shared-secrets", "system_username"),
-          "password" => Kinetic::Platform::Kubernetes.decode_secret("shared-secrets", "system_password")
+          "password" => Kinetic::Platform::Kubernetes.decode_secret("shared-secrets", "system_password"),
+          "http_options" => @http_options
         }
 
         # Create the components if they were defined in the passed in data
@@ -134,7 +144,7 @@ module Kinetic
       def space_exists?(space_slug)
         # check if space slug is already used
         Kinetic::Platform.logger.info "Checking if the #{space_slug} space slug is already installed"
-        http = Http.new(@core.username, @core.password)
+        http = Http.new(@core.username, @core.password, @http_options)
         res = http.get("#{@core.system_api}/spaces/#{space_slug}",
           {}, http.default_headers)
 
@@ -146,6 +156,16 @@ module Kinetic
 
         # return true if space exists, or false if it doesn't exist
         res.status == 200
+      end
+
+      def script_data(component_data, script_arguments)
+        data = {
+          "http_options" => @http_options,
+          "data" => @template_data
+        }
+        data.merge!(component_data) if component_data.is_a?(Hash)
+        data.merge!(script_arguments) if script_arguments.is_a?(Hash)
+        data
       end
 
     end

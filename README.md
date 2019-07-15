@@ -46,21 +46,22 @@ For instance, if the `install` action is called, by default the tenant data mana
 
 ### Install Action
 
-The following properties must be provided to the tenant data manager when installing a tenant space.
+The following properties may be provided to the tenant data manager when installing a tenant space.
 
-* action -     **install**
+* action -     **install**                  # name of the action
 * slug -       **my-space**                 # the space slug to create
 * host -       **https://kinops-test.io**   # the URL of the core server
-* subdomains - **true**                     # whether subdomains are used for tenant spaces
-* log_level -  **info**                     # SDK log level passed to templates scripts
+* subdomains - **false**                    # Optional flag to disable subdomains for tenant spaces
+* http_options                              # Optional HTTP configuration hash
+  * log_level -  **info**                   # Optional log level passed to template scripts
+  * ssl_verify_mode - **peer**              # Optional flag to enable peer certificate validation when https is used for the host
+  * ssl_ca_file - **/app/cert/tls.crt**     # Optional location of certificate, required for peer validation
 * components                                # Map of platform component configurations
   * core
     * space
       * name    - **My Space**              # Name of the space to create
   * task
     * license                               # Full content of the license
-    * username - **admin**                  # Name of the task configurator admin user
-    * password - **KINETIC_TASK_CONFIGURATOR_PASSWORD** # Environment variable name for the task configurator admin password
     * container
       * image - **kineticdata/task**        # Name of the docker image to use for Kinetic Task
       * tag - **4.4.0**                     # Tag of the docker image to use for Kinetic Task
@@ -69,13 +70,13 @@ The following properties must be provided to the tenant data manager when instal
   * branch | tag | commit - **develop**     # Git branch name, tag name, or commit hash
   * script - **install.rb**                 # Optional name of script to run in the template, default: `#{action}.rb`
   * script-args - **{}**                    # Optional arguments passed to the template script, default: `{}`
-* templateData
+* templateData                              # Optional data to pass to all template scripts
   * users
     * username: joe.user
       email: joe.user@example.com
       attributes: []
     * username: jane.user
-* templateDataSecrets
+* templateDataSecrets                       # Optional data stored in secrets files, passed to all template scripts
   * key: name-of-secrets-file
 
 #### cURL example to install tenant
@@ -89,7 +90,11 @@ curl -X POST \
     "action": "install",
     "slug": "my-space",
     "host": "https://kinops-test.io",
-    "log_level": "info",
+    "http_options": {
+      "log_level": "info",
+      "ssl_ca_file" => "/app/cert/tls.crt",
+      "ssl_verify_mode" => "peer"
+    },
     "components": {
       "core": {
         "space": {
@@ -126,8 +131,10 @@ The following properties must be provided to the tenant data manager when decomm
 * action -     **decommission**
 * slug -       **my-space**                 # the space slug to decommission
 * host -       **https://kinops-test.io**   # the URL of the core server
-* subdomains - **true**                     # whether subdomains are used for tenant spaces
-* log_level -  **info**                     # SDK log level passed to templates scripts
+* http_options                              # Optional HTTP configuration hash
+  * log_level -  **info**                   # Optional log level passed to template scripts
+  * ssl_verify_mode - **none**              # Optional flag to enable peer certificate validation
+  * ssl_ca_file                             # Optional location of certificate, required for peer validation
 
 #### cURL example to decommission tenant
 
@@ -139,63 +146,7 @@ curl -X POST \
   -d '{
     "action": "decommission",
     "slug": "my-space",
-    "host": "https://kinops-test.io",
-    "subdomains" :true,
-    "log_level": "info"
-  }'
-```
-
-### Repair Action
-
-The following properties must be provided to the tenant data manager when repairing a tenant space.
-
-* action -     **repair**
-* slug -       **my-space**                 # the space slug to repair
-* host -       **https://kinops-test.io**   # the URL of the core server
-* subdomains - **true**                     # whether subdomains are used for tenant spaces
-* log_level -  **info**                     # SDK log level passed to templates scripts
-* components                                # Map of platform component configurations
-  * task
-    * username - **admin**                  # Name of the task configurator admin user
-    * password - **KINETIC_TASK_CONFIGURATOR_PASSWORD** # Environment variable name for the task configurator admin password
-    * container
-      * image - **kineticdata/task**        # Name of the docker image to use for Kinetic Task
-      * tag - **4.4.0**            # Tag of the docker image to use for Kinetic Task
-* templates                                 # Array of templates that will be called
-  * url - **https://github.com/kineticdata/platform-template-base.git** # URL of the template repository in GitHub
-  * branch | tag | commit - **develop**     # Git branch name, tag name, or commit hash
-  * script - **repair.rb**                  # Optional name of script to run in the template, default: `#{action}.rb`
-  * script-args - **{}**                    # Optional arguments passed to the template script, default: `{}`
-
-#### cURL example to repair tenant
-
-```sh
-curl -X POST \
-  http://localhost:4567/repair \
-  -H 'Accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "action": "repair",
-    "slug": "my-space",
-    "host": "https://kinops-test.io",
-    "subdomains" :true,
-    "log_level": "info",
-    "components": {
-      "task": {
-        "username": "admin",
-        "password": "KINETIC_TASK_CONFIGURATOR_PASSWORD",
-        "container": {
-          "image": "kineticdata/task",
-          "tag": "4.4.0"
-        }
-      }
-    },
-    "templates": [
-      {
-        "url": "https://github.com/kineticdata/platform-template-base.git",
-        "branch":"develop"
-      }
-    ]
+    "host": "https://kinops-test.io"
   }'
 ```
 
@@ -206,8 +157,10 @@ The following properties must be provided to the tenant data manager when uninst
 * action -     **uninstall**
 * slug -       **my-space**                 # the space slug to uninstall
 * host -       **https://kinops-test.io**   # the URL of the core server
-* subdomains - **true**                     # whether subdomains are used for tenant spaces
-* log_level -  **info**                     # SDK log level passed to templates scripts
+* http_options                              # Optional HTTP configuration hash
+  * log_level -  **info**                   # Optional log level passed to template scripts
+  * ssl_verify_mode - **none**              # Optional flag to enable peer certificate validation
+  * ssl_ca_file                             # Optional location of certificate, required for peer validation
 
 #### cURL example to uninstall tenant
 
@@ -219,62 +172,6 @@ curl -X POST \
   -d '{
     "action": "decommission",
     "slug": "my-space",
-    "host": "https://kinops-test.io",
-    "subdomains" :true,
-    "log_level": "info"
-  }'
-```
-
-### Upgrade Action
-
-The following properties must be provided to the tenant data manager when upgrading a tenant space.
-
-* action -     **upgrade**
-* slug -       **my-space**                 # the space slug to upgrade
-* host -       **https://kinops-test.io**   # the URL of the core server
-* subdomains - **true**                     # whether subdomains are used for tenant spaces
-* log_level -  **info**                     # SDK log level passed to templates scripts
-* components                                # Map of platform component configurations
-  * task
-    * username - **admin**                  # Name of the task configurator admin user
-    * password - **KINETIC_TASK_CONFIGURATOR_PASSWORD** # Environment variable name for the task configurator admin password
-    * container
-      * image - **kineticdata/task**        # Name of the docker image to use for Kinetic Task
-      * tag - **4.4.0**            # Tag of the docker image to use for Kinetic Task
-* templates                                 # Array of templates that will be called
-  * url - **https://github.com/kineticdata/platform-template-base.git** # URL of the template repository in GitHub
-  * branch | tag | commit - **develop**     # Git branch name, tag name, or commit hash
-  * script - **upgrade.rb**                 # Optional name of script to run in the template, default: `#{action}.rb`
-  * script-args - **{}**                    # Optional arguments passed to the template script, default: `{}`
-
-#### cURL example to upgrade tenant
-
-```sh
-curl -X POST \
-  http://localhost:4567/upgrade \
-  -H 'Accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "action": "upgrade",
-    "slug": "my-space",
-    "host": "https://kinops-test.io",
-    "subdomains" :true,
-    "log_level": "info",
-    "components": {
-      "task": {
-        "username": "admin",
-        "password": "KINETIC_TASK_CONFIGURATOR_PASSWORD",
-        "container": {
-          "image": "kineticdata/task",
-          "tag": "4.4.0"
-        }
-      }
-    },
-    "templates": [
-      {
-        "url": "https://github.com/kineticdata/platform-template-base.git",
-        "branch":"develop"
-      }
-    ]
+    "host": "https://kinops-test.io"
   }'
 ```

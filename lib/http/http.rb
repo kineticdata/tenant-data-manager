@@ -299,6 +299,9 @@ module Kinetic
           if (@options[:ssl_verify_mode].to_s.strip.downcase == 'peer')
             http.verify_mode = OpenSSL::SSL::VERIFY_PEER
             http.ca_file = @options[:ssl_ca_file] if @options[:ssl_ca_file]
+            if @options[:log_level].to_s.strip.downcase == 'trace'
+              OpenSSL.debug = true
+            end
           else
             http.verify_mode = OpenSSL::SSL::VERIFY_NONE
           end
@@ -325,10 +328,14 @@ module Kinetic
       #
       # @param username [String] username for Basic Authentication
       # @param password [String] password for Basic Authentication
-      def initialize(username=nil, password=nil)
+      # @param options [Hash] hash of optional parameters
+      #   *log_level - [String] (off) log_level
+      #   *ssl_ca_file - [String] /etc/ca.crt certificate
+      #   *ssl_verify_mode - [String] none use `peer` to enable verification
+      def initialize(username=nil, password=nil, options={})
         @username = username
         @password = password
-        @options = {}
+        @options = options
       end
 
     end
