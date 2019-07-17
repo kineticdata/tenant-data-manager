@@ -27,11 +27,16 @@ module Kinetic
           http_options = options["http_options"] || {}
           @http_options = {
             :log_level => http_options["log_level"] || "off",
+            :log_output => http_options["log_output"] || "STDERR",
+            :gateway_retry_limit => (http_options["gateway_retry_limit"] || 5).to_i,
+            :gateway_retry_delay => (http_options["gateway_retry_delay"] || 1.0).to_f,
             :ssl_ca_file => http_options["ssl_ca_file"] || "/etc/ssl/ca.crt",
             :ssl_verify_mode => http_options["ssl_verify_mode"] || "peer"
           }
           @internal_http_options = {
             :log_level => "trace",
+            :gateway_retry_limit => (http_options["gateway_retry_limit"] || 5).to_i,
+            :gateway_retry_delay => (http_options["gateway_retry_delay"] || 1.0).to_f,
             :ssl_ca_file => "/app/cert/tls.crt",
             :ssl_verify_mode => "peer"
           }
@@ -82,7 +87,7 @@ module Kinetic
 
       def validate_host
         raise "`host` cannot be blank." if @host.to_s.strip.empty?
-        raise "`host` must use http or https protocol." if (@host =~ /^https?:\/\/.+/).nil?
+        raise "`host` must use http[s] protocol." if (@host =~ /^https?:\/\/.+/).nil?
         raise "`host` must not end with a forward slash." if (@host =~ /[^\/]$/).nil?
       end
 
@@ -97,8 +102,7 @@ module Kinetic
           "space_slug" => @slug,
           "subdomains" => @subdomains,
           "username" => Kinetic::Platform::Kubernetes.decode_secret("shared-secrets", "system_username"),
-          "password" => Kinetic::Platform::Kubernetes.decode_secret("shared-secrets", "system_password"),
-          "http_options" => @http_options
+          "password" => Kinetic::Platform::Kubernetes.decode_secret("shared-secrets", "system_password")
         }
 
         # Create the components if they were defined in the passed in data
@@ -163,8 +167,8 @@ module Kinetic
           "http_options" => @http_options,
           "data" => @template_data
         }
-        data.merge!(component_data) if component_data.is_a?(Hash)
-        data.merge!(script_arguments) if script_arguments.is_a?(Hash)
+        data = data.merge(component_data) if component_data.is_a?(Hash)
+        data = data.merge(script_arguments) if script_arguments.is_a?(Hash)
         data
       end
 

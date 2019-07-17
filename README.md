@@ -54,6 +54,10 @@ The following properties may be provided to the tenant data manager when install
 * subdomains - **false**                    # Optional flag to disable subdomains for tenant spaces
 * http_options                              # Optional HTTP configuration hash
   * log_level -  **info**                   # Optional log level passed to template scripts
+  * log_output - **STDERR**                 # Optional log output location passed to template scripts
+  * gateway_retry_limit - **-1**            # Optional max number of times to retry a bad gateway
+  * gateway_retry_delay - **1.0**           # Optional number of seconds to delay before retrying a bad gateway
+  * max_redirects - **5**                   # Optional max number of times to redirect
   * ssl_verify_mode - **peer**              # Optional flag to enable peer certificate validation when https is used for the host
   * ssl_ca_file - **/app/cert/tls.crt**     # Optional location of certificate, required for peer validation
 * components                                # Map of platform component configurations
@@ -92,6 +96,7 @@ curl -X POST \
     "host": "https://kinops-test.io",
     "http_options": {
       "log_level": "info",
+      "log_output": "STDERR",
       "ssl_ca_file" => "/app/cert/tls.crt",
       "ssl_verify_mode" => "peer"
     },
@@ -133,6 +138,10 @@ The following properties must be provided to the tenant data manager when decomm
 * host -       **https://kinops-test.io**   # the URL of the core server
 * http_options                              # Optional HTTP configuration hash
   * log_level -  **info**                   # Optional log level passed to template scripts
+  * log_output - **STDERR**                 # Optional log output location passed to template scripts
+  * gateway_retry_limit - **-1**            # Optional max number of times to retry a bad gateway
+  * gateway_retry_delay - **1.0**           # Optional number of seconds to delay before retrying a bad gateway
+  * max_redirects - **5**                   # Optional max number of times to redirect
   * ssl_verify_mode - **none**              # Optional flag to enable peer certificate validation
   * ssl_ca_file                             # Optional location of certificate, required for peer validation
 
@@ -159,6 +168,10 @@ The following properties must be provided to the tenant data manager when uninst
 * host -       **https://kinops-test.io**   # the URL of the core server
 * http_options                              # Optional HTTP configuration hash
   * log_level -  **info**                   # Optional log level passed to template scripts
+  * log_output - **STDERR**                 # Optional log output location passed to template scripts
+  * gateway_retry_limit - **-1**             # Optional max number of times to retry a bad gateway
+  * gateway_retry_delay - **1.0**           # Optional number of seconds to delay before retrying a bad gateway
+  * max_redirects - **5**                   # Optional max number of times to redirect
   * ssl_verify_mode - **none**              # Optional flag to enable peer certificate validation
   * ssl_ca_file                             # Optional location of certificate, required for peer validation
 

@@ -71,7 +71,7 @@ module Kinetic
           tries = tries + 1
           Kinetic::Platform.logger.info "Try #{tries}, checking space subdomain at #{url}"
           http = Http.new(nil, nil, @http_options)
-          res = http.get(url, {}, http.default_headers)
+          res = http.get(url, {}, http.default_headers, { :gateway_retry_limit => -1 })
           if res.status == 200
             Kinetic::Platform.logger.info "  #{res.status}: space subdomain is ready"
             subdomain_ready = true
@@ -250,7 +250,7 @@ module Kinetic
             tries = tries + 1
             Kinetic::Platform.logger.info "Try #{tries}, checking task status at #{url}"
             http = Http.new(nil, nil, @http_options)
-            res = http.get(url, {}, {})
+            res = http.get(url, {}, {}, { :gateway_retry_limit => -1 })
             if res.status == 200
               Kinetic::Platform.logger.info "  #{res.status}: task is running"
               task_is_running = true
