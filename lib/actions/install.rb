@@ -316,6 +316,12 @@ module Kinetic
             }
             url = "#{@task.api_v2}/config/auth"
             res = http.put(url, payload, http.default_headers)
+
+            # delete the playground source
+            Kinetic::Platform.logger.info "Deleting the task Playground source"
+            http = Http.new(@task.username, @task.password, @http_options)
+            url = "#{@task.api_v2}/sources/Playground"
+            res = http.delete(url, http.default_headers)
           else
             msg = "The #{ACTION} action for the #{@core.space_slug} space failed. Task did not startup in the allowable timeframe."
             Kinetic::Platform.logger.info msg

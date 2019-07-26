@@ -34,9 +34,10 @@ module Kinetic
             :ssl_verify_mode => http_options["ssl_verify_mode"] || "peer"
           }
           @internal_http_options = {
-            :log_level => "trace",
-            :gateway_retry_limit => (http_options["gateway_retry_limit"] || 5).to_i,
-            :gateway_retry_delay => (http_options["gateway_retry_delay"] || 1.0).to_f,
+            :log_level => @http_options[:log_level],
+            :log_output => @http_options[:log_output],
+            :gateway_retry_limit => @http_options[:gateway_retry_limit],
+            :gateway_retry_delay => @http_options[:gateway_retry_delay],
             :ssl_ca_file => "/app/cert/tls.crt",
             :ssl_verify_mode => "peer"
           }
@@ -154,7 +155,7 @@ module Kinetic
 
         # raise an error if the state of the space slug could not be determined
         if res.status != 200 && res.status != 404
-          msg = "#{res.status}: Aborting #{ACTION} of space slug #{space_slug}, #{res.message}"
+          msg = "#{res.status}: Aborting provisioning action of space slug #{space_slug}, #{res.message}"
           raise StandardError.new msg
         end
 

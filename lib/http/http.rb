@@ -1,7 +1,7 @@
 require 'base64'
 require 'erb'
-require 'net/http'
-require 'openssl'
+require 'net/https'
+require 'uri'
 
 module Kinetic
   module Platform
@@ -464,16 +464,17 @@ module Kinetic
         http = Net::HTTP.new(uri.host, uri.port)
         if (uri.scheme == 'https')
           http.use_ssl = true
-          OpenSSL.debug = @options[:log_level].to_s.strip.downcase == 'trace'
           if (@options[:ssl_verify_mode].to_s.strip.downcase == 'peer')
-            http.verify_mode = OpenSSL::SSL::VERIFY_PEER
             http.ca_file = @options[:ssl_ca_file] if @options[:ssl_ca_file]
+            http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+            OpenSSL.debug = @options[:log_level].to_s.strip.downcase == 'trace'
           else
             http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+            OpenSSL.debug = false
           end
         end
-        http.read_timeout=60
-        http.open_timeout=60
+        http.read_timeout = (@options[:read_timeout] || 60).to_i
+        http.open_timeout = (@options[:open_timeout] || 60).to_i
         http
       end
 
