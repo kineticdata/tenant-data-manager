@@ -19,14 +19,16 @@ module Kinetic
 
       def self.prepare_template_data(template_data, template_secret_data)
         data = (template_secret_data || {}).each_with_object({}) do |(key,value),result|
-          self.decode_secrets(key, value, result)
+          Kinetic::Platform::ActionBase.decode_secrets(key, value, result)
         end
         data.deep_merge!(template_data || {})
       end
 
       def self.decode_secrets(key, value, memo={})
         if value.is_a?(Hash)
-          memo[key] = value.each_with_object({}) { |(k,v),r| self.decode_secrets(k, v, r) }
+          memo[key] = value.each_with_object({}) do |(k,v),r| 
+            Kinetic::Platform::ActionBase.decode_secrets(k, v, r)
+          end
         else
           memo[key] = Kinetic::Platform::Kubernetes.decode_secrets_file(value)
         end
@@ -65,7 +67,7 @@ module Kinetic
           # build the extra data to send to templates
           # add decoded template data secrets first, then merge in the rest of the
           # template data to allow overwriting values that were provided as stored secrets
-          @template_data = self.prepare_template_data(options["templateData"], options["templateDataSecrets"])
+          @template_data = Kinetic::Platform::ActionBase.prepare_template_data(options["templateData"], options["templateDataSecrets"])
 
           # validate the arguments
           validate
