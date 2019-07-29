@@ -2,6 +2,8 @@ module Kinetic
   module Platform
     class ActionBase
 
+      require 'deep_merge'
+
       attr_reader :action, :slug, :templates,
                   :bridgehub, :core, :discussions, :filehub, :task,
                   :http_options, :internal_http_options, :template_data
@@ -13,6 +15,24 @@ module Kinetic
       UNINSTALL    = "uninstall"
 
       ACTIONS = [ INSTALL, REPAIR, UPGRADE, DECOMMISSION, UNINSTALL ]
+
+
+      def self.prepare_template_data(template_data, template_secret_data)
+        data = (template_secret_data || {}).each_with_object({}) do |(key,value),result|
+          self.decode_secrets(key, value, result)
+        end
+        data.deep_merge!(template_data || {})
+      end
+
+      def self.decode_secrets(key, value, memo={})
+        if value.is_a?(Hash)
+          memo[key] = value.each_with_object({}) { |(k,v),r| self.decode_secrets(k, v, r) }
+        else
+          memo[key] = Kinetic::Platform::Kubernetes.decode_secrets_file(value)
+        end
+        memo
+      end
+
 
       def initialize(options)
         begin
@@ -45,17 +65,13 @@ module Kinetic
           # build the extra data to send to templates
           # add decoded template data secrets first, then merge in the rest of the
           # template data to allow overwriting values that were provided as stored secrets
-          @template_data = (options["templateDataSecrets"] || {}).each_with_object({}) do |(key,secrets_file),result|
-            result[key] = Kinetic::Platform::Kubernetes.decode_secrets_file(secrets_file)
-          end
-          @template_data.merge!(options["templateData"] || {})
+          @template_data = self.prepare_template_data(options["templateData"], options["templateDataSecrets"])
 
           # validate the arguments
           validate
         rescue Exception => e
           raise e
         end
-
       end
 
       def execute
