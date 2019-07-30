@@ -52,7 +52,6 @@ module Kinetic
             :log_output => http_options["log_output"] || "STDERR",
             :gateway_retry_limit => (http_options["gateway_retry_limit"] || 5).to_i,
             :gateway_retry_delay => (http_options["gateway_retry_delay"] || 1.0).to_f,
-            :ssl_ca_file => http_options["ssl_ca_file"] || "/etc/ssl/ca.crt",
             :ssl_verify_mode => http_options["ssl_verify_mode"] || "peer"
           }
           @internal_http_options = {
@@ -60,7 +59,6 @@ module Kinetic
             :log_output => @http_options[:log_output],
             :gateway_retry_limit => @http_options[:gateway_retry_limit],
             :gateway_retry_delay => @http_options[:gateway_retry_delay],
-            :ssl_ca_file => "/app/cert/tls.crt",
             :ssl_verify_mode => "peer"
           }
 

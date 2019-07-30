@@ -48,7 +48,6 @@ For instance, if the `install` action is called, by default the tenant data mana
 
 The following properties may be provided to the tenant data manager when installing a tenant space.
 
-* action -     **install**                  # name of the action
 * slug -       **my-space**                 # the space slug to create
 * host -       **https://kinops-test.io**   # the URL of the core server
 * subdomains - **false**                    # Optional flag to disable subdomains for tenant spaces
@@ -91,7 +90,6 @@ curl -X POST \
   -H 'Accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
-    "action": "install",
     "slug": "my-space",
     "host": "https://kinops-test.io",
     "http_options": {
@@ -133,7 +131,6 @@ curl -X POST \
 
 The following properties must be provided to the tenant data manager when decommissioning a tenant space.
 
-* action -     **decommission**
 * slug -       **my-space**                 # the space slug to decommission
 * host -       **https://kinops-test.io**   # the URL of the core server
 * http_options                              # Optional HTTP configuration hash
@@ -153,7 +150,6 @@ curl -X POST \
   -H 'Accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
-    "action": "decommission",
     "slug": "my-space",
     "host": "https://kinops-test.io"
   }'
@@ -163,7 +159,6 @@ curl -X POST \
 
 The following properties must be provided to the tenant data manager when uninstalling a tenant space.
 
-* action -     **uninstall**
 * slug -       **my-space**                 # the space slug to uninstall
 * host -       **https://kinops-test.io**   # the URL of the core server
 * http_options                              # Optional HTTP configuration hash
@@ -183,7 +178,6 @@ curl -X POST \
   -H 'Accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
-    "action": "decommission",
     "slug": "my-space",
     "host": "https://kinops-test.io"
   }'
