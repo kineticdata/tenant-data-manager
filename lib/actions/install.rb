@@ -244,7 +244,7 @@ module Kinetic
 
         if res.status == 200
           # Wait for task to be running
-          task_is_running, tries, max_tries = false, 0, 5
+          task_is_running, tries, max_tries = false, 0, 12
           url = "#{@task.api}"
           loop do
             tries = tries + 1
