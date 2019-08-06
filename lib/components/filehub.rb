@@ -17,8 +17,8 @@ module Kinetic
         @access_key_id, @access_key_secret = nil, nil
 
         adapter = options["adapter"] || {}
-        @adapter_class = adapter["class"] || default_adapter["class"]
-        @adapter_properties = adapter["properties"] || default_adapter["properties"]
+        @adapter_class = adapter["class"] || adapter_class()
+        @adapter_properties = adapter["properties"] || adapter_properties()
       end
 
       def server
@@ -29,27 +29,8 @@ module Kinetic
         "#{server}/app/api/v1"
       end
 
-      def default_adapter
-        {
-          "class" => "com.kineticdata.filehub.adapters.local.LocalFilestoreAdapter",
-          "properties" => {
-            "Directory" => local_directory
-          }
-        }
-      end
-
-      def local_directory
-        # TODO: Need to be able to use the filestore slug in the directory path,
-        # but currently there is no way to create this directory, so sharing the
-        # root directory already created on the file system. This may cause 
-        # problems if multiple spaces are created.
-
-        # "/home/filesDirectory/#{filestore_slug}"
-        "/home/filesDirectory"
-      end
-
       def filestore_slug
-        "#{@space_slug}-core"
+        "#{@space_slug}"
       end
 
       def filestore_path
@@ -70,6 +51,33 @@ module Kinetic
             }
           }
         }
+      end
+
+
+      private
+
+      def adapter_class
+        ENV['FILESTORE_ADAPTER_CLASS']
+      end
+
+      def adapter_properties
+        {
+          "Name" => @space_slug,
+          "Slug" => filestore_slug,
+          grouping_property => "#{grouping_prefix}/#{@space_slug}"
+        }.merge(adapter_secrets)
+      end
+
+      def adapter_secrets
+        Kinetic::Platform::Kubernetes.decode_secrets_file("filestore-secrets")
+      end
+
+      def grouping_property
+        ENV['FILESTORE_GROUPING_PROPERTY']
+      end
+
+      def grouping_prefix
+        ENV['FILESTORE_GROUPING_PREFIX']
       end
 
     end # class
