@@ -53,31 +53,27 @@ module Kinetic
         }
       end
 
-
-      private
-
       def adapter_class
         ENV['FILESTORE_ADAPTER_CLASS']
       end
 
+      def adapter_grouping_property
+        ENV['FILESTORE_GROUPING_PROPERTY']
+      end
+
+      def adapter_grouping_prefix
+        ENV['FILESTORE_GROUPING_PREFIX']
+      end
       def adapter_properties
         {
           "Name" => @space_slug,
           "Slug" => filestore_slug,
-          grouping_property => "#{grouping_prefix}/#{@space_slug}"
+          adapter_grouping_property => "#{adapter_grouping_prefix}/#{@space_slug}"
         }.merge(adapter_secrets)
       end
 
       def adapter_secrets
         Kinetic::Platform::Kubernetes.decode_secrets_file("filestore-secrets")
-      end
-
-      def grouping_property
-        ENV['FILESTORE_GROUPING_PROPERTY']
-      end
-
-      def grouping_prefix
-        ENV['FILESTORE_GROUPING_PREFIX']
       end
 
     end # class

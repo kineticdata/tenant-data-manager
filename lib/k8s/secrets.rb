@@ -9,7 +9,8 @@ module Kinetic
         cmd = "kubectl get -n #{namespace} secret #{secrets_file} -o yaml"
         secrets = `#{cmd}`
         if secrets
-          data = YAML.load(secrets)["data"]
+          secret_content = YAML.load(secrets) || {}
+          data = secret_content["data"] || {}
           value = data[secret_key]
           value.nil? ? nil : Base64.decode64(value)
         else
@@ -21,7 +22,8 @@ module Kinetic
         cmd = "kubectl get -n #{namespace} secret #{secrets_file} -o yaml"
         secrets = `#{cmd}`
         if secrets
-          YAML.load(secrets)["data"].inject({}) do |memo, (key,value)|
+          secret_content = YAML.load(secrets) || {}
+          (secret_content["data"] || {}).inject({}) do |memo, (key,value)|
             memo[key] = Base64.decode64(value)
             memo
           end
