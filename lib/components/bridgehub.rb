@@ -3,9 +3,7 @@ module Kinetic
     class Bridgehub
 
       attr_reader :host, :username, :password
-
-      attr_accessor :space_slug, :access_key_id, :access_key_secret,
-                    :service_user_username, :service_user_password
+      attr_accessor :space_slug, :service_user_username, :service_user_password
       
       def initialize(options)
         @host = options["host"]
@@ -14,7 +12,6 @@ module Kinetic
         @username = options["username"] || "admin"
         @password = options["password"] || "admin"
 
-        @access_key_id, @access_key_secret = nil, nil
         @service_user_username, @service_user_password = nil, nil
       end
 
@@ -23,15 +20,15 @@ module Kinetic
       end
 
       def api
-        "#{server}/app/manage-api/v1"
-      end
-
-      def client_api
         "#{server}/app/api/v1"
       end
 
+      def client_api
+        "#{server}/#{@space_slug}/app/api/v1"
+      end
+
       def bridge_slug
-        "#{@space_slug.to_s}-core"
+        "kinetic-core"
       end
 
       def bridge_path
@@ -41,14 +38,14 @@ module Kinetic
       def template_bindings
         {
           "api" => api,
+          "client_api" => client_api,
           "server" => server,
           "space_slug" => @space_slug,
           "bridges" => {
             "kinetic-core" => {
-              "access_key_id" => @access_key_id,
-              "access_key_secret" => @access_key_secret,
               "bridge_path" => bridge_path,
-              "slug" => bridge_slug
+              "slug" => bridge_slug,
+              "service_endpoint_slug" => "bridgehub"
             }
           }
         }
