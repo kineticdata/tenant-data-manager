@@ -40,6 +40,10 @@ module Kinetic
         "#{server}/app/api/v1"
       end
 
+      def proxy_url
+        "#{server}/app/serviceEndpoints"
+      end
+
       def template_bindings
         {
           "api" => api,
