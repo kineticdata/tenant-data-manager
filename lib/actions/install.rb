@@ -144,16 +144,34 @@ module Kinetic
           "name" => "Kinetic Core",
           "slug" => @bridgehub.bridge_slug,
           "ipAddresses" => "*",
-          "useAccessKeys" => "false",
+          "useAccessKeys" => "true",
           "properties" => {
             "Username" => service_user_username,
             "Password" => service_user_password,
             "Kinetic Core Space Url" => "#{@core.server}"
           }
         }
-        url = "#{@core.proxy_url}/serviceEndpoints/bridgehub/app/api/v1/bridges"
+        url = "#{@core.proxy_url}/#{@bridgehub.service_endpoint_slug}/app/api/v1/bridges"
         res = http.post(url, payload, http.default_headers)
-        if res.status != 200
+        if res.status == 200
+          # create bridgehub access key
+          Kinetic::Platform.logger.info "Creating an access key for the #{@bridgehub.bridge_slug} bridge"
+          bridge_access_key_id = Kinetic::Platform::Random.simple(8)
+          bridge_access_key_secret = Kinetic::Platform::Random.simple(32)
+          payload = {
+            "description" => "#{@bridgehub.bridge_slug}",
+            "id" => bridge_access_key_id,
+            "secret" => bridge_access_key_secret
+          }
+          url = "#{@core.proxy_url}/#{@bridgehub.service_endpoint_slug}/app/api/v1/bridges/#{@bridgehub.bridge_slug}/accessKeys"
+          res = http.post(url, payload, http.default_headers)
+          if res.status != 200
+            Kinetic::Platform.logger.info "POST #{url} - #{res.status}: #{res.message}"
+          end
+          # update the bridgehub component with the access key info
+          @bridgehub.access_key_id = bridge_access_key_id
+          @bridgehub.access_key_secret = bridge_access_key_secret
+        else
           Kinetic::Platform.logger.info "POST #{url} - #{res.status}: #{res.message}"
         end
 
