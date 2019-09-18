@@ -41,12 +41,13 @@ module Kinetic
       end
 
       def proxy_url
-        "#{server}/app/serviceEndpoints"
+        "#{server}/app/components"
       end
 
       def template_bindings
         {
           "api" => api,
+          "proxy_url" => proxy_url,
           "server" => server,
           "space_slug" => @space_slug,
           "space_name" => @space_name,

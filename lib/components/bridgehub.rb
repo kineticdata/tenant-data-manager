@@ -2,7 +2,7 @@ module Kinetic
   module Platform
     class Bridgehub
 
-      attr_reader :host, :username, :password, :service_endpoint_slug
+      attr_reader :host, :username, :password, :component_type
       attr_accessor :space_slug, :service_user_username, :service_user_password
       
       def initialize(options)
@@ -12,7 +12,7 @@ module Kinetic
         @username = options["username"] || "admin"
         @password = options["password"] || "admin"
 
-        @service_endpoint_slug = "bridgehub"
+        @component_type = "bridgehub"
 
         @service_user_username, @service_user_password = nil, nil
       end
@@ -47,7 +47,7 @@ module Kinetic
             "kinetic-core" => {
               "bridge_path" => bridge_path,
               "slug" => bridge_slug,
-              "service_endpoint_slug" => @service_endpoint_slug
+              "component_type" => @component_type
             }
           }
         }

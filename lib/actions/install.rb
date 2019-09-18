@@ -136,22 +136,20 @@ module Kinetic
           return
         end
 
-        # create kinetic core bridge using the service endpoint proxy
+        # create kinetic core bridge using the platform component proxy
         Kinetic::Platform.logger.info "Creating the #{@bridgehub.bridge_slug} bridge"
         http = Http.new(service_user_username, service_user_password, @http_options)
         payload = {
           "adapterClass" => "com.kineticdata.bridgehub.adapter.kineticcore.KineticCoreAdapter",
           "name" => "Kinetic Core",
           "slug" => @bridgehub.bridge_slug,
-          "ipAddresses" => "*",
-          "useAccessKeys" => "true",
           "properties" => {
             "Username" => service_user_username,
             "Password" => service_user_password,
             "Kinetic Core Space Url" => "#{@core.server}"
           }
         }
-        url = "#{@core.proxy_url}/#{@bridgehub.service_endpoint_slug}/app/api/v1/bridges"
+        url = "#{@core.proxy_url}/#{@bridgehub.component_type}/app/api/v1/bridges"
         res = http.post(url, payload, http.default_headers)
         if res.status != 200
           Kinetic::Platform.logger.info "POST #{url} - #{res.status}: #{res.message}"
