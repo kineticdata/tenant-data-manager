@@ -189,7 +189,7 @@ module Kinetic
           Kinetic::Platform.logger.info "POST #{url} - #{res.status}: #{res.message}"
         end
 
-        # create space oauth clients for the service user
+        # create space oauth client for the service user
         Kinetic::Platform.logger.info "Creating the #{@core.space_name} space oauth client for #{service_user_username}"
         http = Http.new(service_user_username, service_user_password, @http_options)
         payload = {
@@ -205,20 +205,20 @@ module Kinetic
           Kinetic::Platform.logger.info "POST #{url} - #{res.status}: #{res.message}"
         end
 
-        # create space oauth clients for task
-        Kinetic::Platform.logger.info "Creating the #{@core.space_name} space oauth client for task"
-        oauth_id_task = "kinetic-task"
-        oauth_secret_task = Kinetic::Platform::Random.simple(32)
+        # configure the task platform component
+        Kinetic::Platform.logger.info "Configuring the #{@core.space_name} task platform component"
+        task_signature_secret = Kinetic::Platform::Random.simple(32)
         http = Http.new(service_user_username, service_user_password, @http_options)
         payload = {
-          "name" => "Kinetic Task",
-          "description" => "OAuth client for Kinetic Task",
-          "clientId" => oauth_id_task,
-          "clientSecret" => oauth_secret_task,
-          "redirectUri" => "#{@task.server}/oauth"
+          "platformComponents" => {
+            "task" => {
+              "secret" => task_signature_secret,
+              "url" => @task.server
+            }
+          }
         }
-        url = "#{@core.api}/oauthClients"
-        res = http.post(url, payload, http.default_headers)
+        url = "#{@core.api}/space"
+        res = http.put(url, payload, http.default_headers)
 
         if res.status == 200
           # Wait for task to be running
@@ -270,26 +270,14 @@ module Kinetic
             url = "#{@task.api_v2}/config/identityStore"
             res = http.put(url, payload, http.default_headers)
 
-            # update task to use oauth
-            Kinetic::Platform.logger.info "Updating the #{@core.space_name} task authentication to use oauth"
+            # update task to use signature authentication
+            Kinetic::Platform.logger.info "Updating #{@core.space_name} task to use signature authentication"
             http = Http.new(@task.username, @task.password, @http_options)
             payload = {
-              "authenticator" => "com.kineticdata.core.v1.authenticators.OAuthAuthenticator",
               "authenticationJsp" => "/WEB-INF/app/login.jsp",
+              "authenticator" => "com.kineticdata.core.v1.authenticators.SignatureAuthenticator",
               "properties" => {
-                # Kinetic Task OAuth Properties
-                "Provider Name" => "Core",
-                "Auto Redirect Login" => "Yes",
-                # OAuth Provider Endpoint Properties
-                "Authorize Endpoint" => "#{@core.server}/app/oauth/authorize",
-                "Token Endpoint" => "#{@core.server}/app/oauth/token",
-                "Check Token Endpoint" => "#{@core.server}/app/oauth/check_token?token=",
-                "Logout Redirect Location" => "#{@core.server}/app/logout",
-                # OAuth Client Properties
-                "Client Id" => oauth_id_task,
-                "Client Secret" => oauth_secret_task,
-                "Redirect URI" => "#{@task.server}/oauth",
-                "Scope" => "full_access"
+                "Secret" => task_signature_secret
               }
             }
             url = "#{@task.api_v2}/config/auth"
@@ -306,7 +294,7 @@ module Kinetic
             return
           end
         else
-          Kinetic::Platform.logger.info "POST #{url} - #{res.status}: #{res.message}"
+          Kinetic::Platform.logger.info "PUT #{url} - #{res.status}: #{res.message}"
         end
 
         # process each of the templates
