@@ -2,7 +2,7 @@ module Kinetic
   module Platform
     class Task
     
-      attr_reader :host, :subdomains, :username, :password_key, :license
+      attr_reader :host, :subdomains, :username, :password_key, :license, :provisioner_username, :provisioner_password
 
       attr_accessor :space_slug, :image, :tag, :password,
                     :service_user_username, :service_user_password
@@ -17,6 +17,9 @@ module Kinetic
         @username = CONFIGURATOR_USERNAME
         @password_key = CONFIGURATOR_PASSWORD_KEY
         @license = options["license"]
+        
+        @provisioner_username = ENV['TENANT-INFRASTRUCTURE-USERNAME']
+        @provisioner_password = ENV['TENANT-INFRASTRUCTURE-PASSWORD']
 
         container = options["container"] || {}
         @image = container["image"]
@@ -56,7 +59,9 @@ module Kinetic
           "username" => @username,
           "password" => @password,
           "service_user_username" => @service_user_username,
-          "service_user_password" => @service_user_password
+          "service_user_password" => @service_user_password,
+          "provisioner_username" => @provisioner_username,
+          "provisioner_password" => @provisioner_password
         }
       end
 

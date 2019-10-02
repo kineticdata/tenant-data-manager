@@ -9,6 +9,11 @@ VERSION = "0.1.0"
 RELEASE_DATE = "2019-05-15"
 
 class Application < Sinatra::Base
+
+  use Rack::Auth::Basic, "Authentication Required" do |username, password|
+    username == ENV['BASIC_AUTH_USERNAME'] and password == ENV['BASIC_AUTH_PASSWORD']
+  end
+
   before do
     content_type :json
   end
