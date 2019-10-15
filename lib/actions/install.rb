@@ -57,7 +57,7 @@ module Kinetic
         payload["tag"] = @task.tag if !@task.tag.nil?
 
         url = "#{@task.deployer_api}/newTenant"
-        res = http.post(url, payload, http.json_headers)
+        res = http.post(url, payload, http.default_headers)
         if res.status != 200
           msg = "POST #{url} - #{res.status}: #{res.message}"
           Kinetic::Platform.logger.info msg

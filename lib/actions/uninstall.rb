@@ -15,7 +15,7 @@ module Kinetic
         http = Http.new(@task.provisioner_username, @task.provisioner_password, @internal_http_options)
         payload = { "tenant" => @task.space_slug }
         url = "#{@task.deployer_api}/deleteTenantDb"
-        res = http.post(url, payload, http.json_headers)
+        res = http.post(url, payload, http.default_headers)
         if res.status != 200
           Kinetic::Platform.logger.info "#{res.status}: #{res.message}"
           throw StandardError.new res.message

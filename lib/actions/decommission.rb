@@ -16,7 +16,7 @@ module Kinetic
         http = Http.new(@task.provisioner_username, @task.provisioner_password, @internal_http_options)
         payload = { "tenant" => @task.space_slug }
         url = "#{@task.deployer_api}/deleteTenant"
-        res = http.post(url, payload, http.json_headers)
+        res = http.post(url, payload, http.default_headers)
 
         # 2 - remove the bridge
         Kinetic::Platform.logger.info "Deleting the bridge for space #{@bridgehub.space_slug}"
