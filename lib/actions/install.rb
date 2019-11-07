@@ -20,10 +20,8 @@ module Kinetic
           end
 
           # set the space_slug in all the components
-          @bridgehub.space_slug=space_slug
           @core.space_slug=space_slug
           @discussions.space_slug=space_slug
-          @filehub.space_slug=space_slug
           @task.space_slug=space_slug
         else
           # if the space slug was pre-generated
@@ -45,7 +43,7 @@ module Kinetic
         res = http.post(url, payload, http.default_headers)
         if res.status != 200
           msg = "POST #{url} - #{res.status}: #{res.message}"
-          Kinetic::Platform.logger.info msg
+          Kinetic::Platform.logger.error msg
           return
         end
 
@@ -60,7 +58,7 @@ module Kinetic
         res = http.post(url, payload, http.default_headers)
         if res.status != 200
           msg = "POST #{url} - #{res.status}: #{res.message}"
-          Kinetic::Platform.logger.info msg
+          Kinetic::Platform.logger.error msg
           return
         end
 
@@ -84,7 +82,7 @@ module Kinetic
 
         if !subdomain_ready
           msg = "The #{ACTION} action for the #{@core.space_slug} space failed. The space cannot be reached."
-          Kinetic::Platform.logger.info msg
+          Kinetic::Platform.logger.error msg
           return
         end
 
@@ -97,12 +95,12 @@ module Kinetic
         service_user_password = Kinetic::Platform::Kubernetes.decode_space_secret(@core.space_slug, @core.service_user_password_key)
 
         # update the credentials in each application that utilizes the service user
-        @bridgehub.service_user_username  = service_user_username
-        @bridgehub.service_user_password  = service_user_password
-        @core.service_user_username       = service_user_username
-        @core.service_user_password       = service_user_password
-        @task.service_user_username       = service_user_username
-        @task.service_user_password       = service_user_password
+        @agent.service_user_username = service_user_username
+        @agent.service_user_password = service_user_password
+        @core.service_user_username  = service_user_username
+        @core.service_user_password  = service_user_password
+        @task.service_user_username  = service_user_username
+        @task.service_user_password  = service_user_password
 
         # create the common space admin user using the system api
         Kinetic::Platform.logger.info "Creating user #{admin_username}"
@@ -132,87 +130,37 @@ module Kinetic
         res = http.post(url, payload, http.default_headers)
         if res.status != 200
           msg = "POST #{url} - #{res.status}: #{res.message}"
-          Kinetic::Platform.logger.info msg
+          Kinetic::Platform.logger.error msg
           return
         end
 
         # create kinetic core bridge using the platform component proxy
-        Kinetic::Platform.logger.info "Creating the #{@bridgehub.bridge_slug} bridge"
+        Kinetic::Platform.logger.info "Creating the #{@agent.bridge_slug} bridge"
         http = Http.new(service_user_username, service_user_password, @http_options)
         payload = {
-          "adapterClass" => "com.kineticdata.bridgehub.adapter.kineticcore.KineticCoreAdapter",
-          "name" => "Kinetic Core",
-          "slug" => @bridgehub.bridge_slug,
+          "adapterClass" => "com.kineticdata.bridgehub.adapter.kineticcore.v2.KineticCoreAdapter",
+          "slug" => @agent.bridge_slug,
           "properties" => {
             "Username" => service_user_username,
             "Password" => service_user_password,
             "Kinetic Core Space Url" => "#{@core.server}"
           }
         }
-        url = "#{@core.proxy_url}/#{@bridgehub.component_type}/app/api/v1/bridges"
+        url = "#{@core.agent_api}/bridges"
+        Kinetic::Platform.logger.info "  POST #{url}"
         res = http.post(url, payload, http.default_headers)
         if res.status != 200
-          Kinetic::Platform.logger.info "POST #{url} - #{res.status}: #{res.message}"
-        end
-
-        # create filehub filestore
-        Kinetic::Platform.logger.info "Creating the #{@filehub.filestore_slug} filestore"
-        http = Http.new(@filehub.username, @filehub.password, @http_options)
-        payload = { 
-          "name" => "#{@filehub.filestore_slug}",
-          "slug" => @filehub.filestore_slug,
-          "adapterClass" => @filehub.adapter_class,
-          "properties" => @filehub.adapter_properties
-        }
-        url = "#{@filehub.api}/filestores"
-        res = http.post(url, payload, http.default_headers)
-        if res.status == 200
-          # create filestore access key
-          Kinetic::Platform.logger.info "Creating an access key for the #{@filehub.filestore_slug} filestore"
-          filestore_access_key_id = Kinetic::Platform::Random.simple(8)
-          filestore_access_key_secret = Kinetic::Platform::Random.simple(32)
-          payload = {
-            "description" => "#{@filehub.filestore_slug}",
-            "id" => filestore_access_key_id,
-            "secret" => filestore_access_key_secret
-          }
-          url = "#{@filehub.api}/filestores/#{@filehub.filestore_slug}/access-keys"
-          res = http.post(url, payload, http.default_headers)
-          if res.status != 200
-            Kinetic::Platform.logger.info "POST #{url} - #{res.status}: #{res.message}"
-          end
-
-          # update the filehub component with the access key info
-          @filehub.access_key_id = filestore_access_key_id
-          @filehub.access_key_secret = filestore_access_key_secret
-        else
-          Kinetic::Platform.logger.info "POST #{url} - #{res.status}: #{res.message}"
-        end
-
-        # create space oauth client for the service user
-        Kinetic::Platform.logger.info "Creating the #{@core.space_name} space oauth client for #{service_user_username}"
-        http = Http.new(service_user_username, service_user_password, @http_options)
-        payload = {
-          "name" => service_user_username,
-          "description" => "OAuth client for #{service_user_username}",
-          "clientId" => service_user_username,
-          "clientSecret" => service_user_password,
-          "redirectUri" => "#{@core.server}/#/OAuthCallback"
-        }
-        url = "#{@core.api}/oauthClients"
-        res = http.post(url, payload, http.default_headers)
-        if res.status != 200
-          Kinetic::Platform.logger.info "POST #{url} - #{res.status}: #{res.message}"
+          Kinetic::Platform.logger.warn "POST #{url} - #{res.status}: #{res.message}"
         end
 
         # configure the task platform component
         Kinetic::Platform.logger.info "Configuring the #{@core.space_name} task platform component"
-        task_signature_secret = Kinetic::Platform::Random.simple(32)
+        @task.signature_secret = Kinetic::Platform::Random.simple(32)
         http = Http.new(service_user_username, service_user_password, @http_options)
         payload = {
           "platformComponents" => {
             "task" => {
-              "secret" => task_signature_secret,
+              "secret" => @task.signature_secret,
               "url" => @task.server
             }
           }
@@ -243,12 +191,11 @@ module Kinetic
           end
 
           if task_is_running
-            # update task to use core as identity store
-            Kinetic::Platform.logger.info "Updating the #{@core.space_name} space task identity store to use core"
-
             # Get the task password from the secret store
             @task.password=Kinetic::Platform::Kubernetes.decode_space_secret(@task.space_slug, @task.password_key)
-
+            if @task.password.nil?
+              Kinetic::Platform.logger.warn "WARNING - Invalid task configurator user credentials - #{@task.username}:#{@task.password}"
+            end
             # add the task license
             if !@task.license.nil?
               Kinetic::Platform.logger.info "Importing the #{@core.space_name} task license"
@@ -258,6 +205,28 @@ module Kinetic
               res = http.post(url, payload, http.default_headers)
             end
 
+            # delete the playground source
+            Kinetic::Platform.logger.info "Deleting the task Playground source"
+            http = Http.new(@task.username, @task.password, @http_options)
+            url = "#{@task.api_v2}/sources/Playground"
+            res = http.delete(url, http.default_headers)
+
+            # delete all console policy rules to use system default
+            http = Http.new(@task.username, @task.password, @http_options)
+            type = "Console Access"
+            url = "#{@task.api_v2}/policyRules/#{http.encode(type)}"
+            res = http.get(url, {}, http.default_headers)
+            if res.status == 200
+              res.content['policyRules'].each do |policyRule|
+                name = policyRule['name']
+                Kinetic::Platform.logger.info "Deleting the #{name} console policy rule"
+                url = "#{@task.api_v2}/policyRules/#{http.encode(type)}/#{http.encode(name)}"
+                res = http.delete(url, http.default_headers)
+              end
+            end
+
+            # update task to use core as identity store
+            Kinetic::Platform.logger.info "Updating #{@core.space_name} task to use core as an identity store."
             http = Http.new(@task.username, @task.password, @http_options)
             payload = {
               "Identity Store" => "com.kineticdata.authentication.kineticcore.KineticCoreIdentityStore",
@@ -274,23 +243,16 @@ module Kinetic
             Kinetic::Platform.logger.info "Updating #{@core.space_name} task to use signature authentication"
             http = Http.new(@task.username, @task.password, @http_options)
             payload = {
-              "authenticationJsp" => "/WEB-INF/app/login.jsp",
               "authenticator" => "com.kineticdata.core.v1.authenticators.SignatureAuthenticator",
               "properties" => {
-                "Secret" => task_signature_secret
+                "Secret" => @task.signature_secret
               }
             }
             url = "#{@task.api_v2}/config/auth"
             res = http.put(url, payload, http.default_headers)
-
-            # delete the playground source
-            Kinetic::Platform.logger.info "Deleting the task Playground source"
-            http = Http.new(@task.username, @task.password, @http_options)
-            url = "#{@task.api_v2}/sources/Playground"
-            res = http.delete(url, http.default_headers)
           else
             msg = "The #{ACTION} action for the #{@core.space_slug} space failed. Task did not startup in the allowable timeframe."
-            Kinetic::Platform.logger.info msg
+            Kinetic::Platform.logger.error msg
             return
           end
         else
@@ -302,10 +264,9 @@ module Kinetic
           template.install
           if File.readable?(template.script_path)
             script_variables = script_data({
-              "bridgehub" => @bridgehub.template_bindings,
+              "agent" => @agent.template_bindings,
               "core" => @core.template_bindings,
               "discussions" => @discussions.template_bindings,
-              "filehub" => @filehub.template_bindings,
               "task" => @task.template_bindings
             }, template.script_args)
             Kinetic::Platform.logger.info "Running #{template.script} in the #{template.name}:#{template.version} repository."

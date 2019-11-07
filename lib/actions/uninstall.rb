@@ -17,12 +17,12 @@ module Kinetic
         url = "#{@task.deployer_api}/deleteTenantDb"
         res = http.post(url, payload, http.default_headers)
         if res.status != 200
-          Kinetic::Platform.logger.info "#{res.status}: #{res.message}"
+          Kinetic::Platform.logger.error "#{res.status}: #{res.message}"
           throw StandardError.new res.message
         end
 
         # Don't think there is a way to do this currently
-        Kinetic::Platform.logger.info "Deleting the files in the filestore for space #{@filehub.space_slug}"
+        Kinetic::Platform.logger.info "Deleting the files in the filestore for space #{@core.space_slug}"
 
 
         duration = duration(timing_start)

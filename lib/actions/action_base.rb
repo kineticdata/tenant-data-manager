@@ -5,7 +5,7 @@ module Kinetic
       require 'deep_merge'
 
       attr_reader :action, :slug, :templates,
-                  :bridgehub, :core, :discussions, :filehub, :task,
+                  :agent, :core, :discussions, :task,
                   :http_options, :internal_http_options, :template_data
 
       INSTALL      = "install"
@@ -125,24 +125,21 @@ module Kinetic
         # Create the components if they were defined in the passed in data
         @component_metadata.map do |key,item|
           case key
-          when "bridgehub"
-            @bridgehub = Kinetic::Platform::Bridgehub.new(options.merge(item))
+          when "agent"
+            @agent = Kinetic::Platform::Agent.new(options.merge(item))
           when "core"
             @core = Kinetic::Platform::Core.new(options.merge(item))
           when "discussions"
             @discussions = Kinetic::Platform::Discussions.new(options.merge(item))
-          when "filehub"
-            @filehub = Kinetic::Platform::Filehub.new(options.merge(item))
           when "task"
             @task = Kinetic::Platform::Task.new(options.merge(item))
           end
         end
 
         # Create any components that were not defined in the passed in data
-        @bridgehub = Kinetic::Platform::Bridgehub.new(options) if @bridgehub.nil?
+        @agent = Kinetic::Platform::Agent.new(options) if @agent.nil?
         @core = Kinetic::Platform::Core.new(options) if @core.nil?
         @discussions = Kinetic::Platform::Discussions.new(options) if @discussions.nil?
-        @filehub = Kinetic::Platform::Filehub.new(options) if @filehub.nil?
         @task = Kinetic::Platform::Task.new(options) if @task.nil?
       end
 
@@ -159,7 +156,7 @@ module Kinetic
       end
 
       def generate_space_slug
-        rand(9999999).to_s.rjust(7,'0')
+        rand(10000000).to_s.rjust(7,'0')
       end
 
       def space_exists?(space_slug)

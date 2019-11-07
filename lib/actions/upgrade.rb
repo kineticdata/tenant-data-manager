@@ -30,10 +30,9 @@ module Kinetic
               Kinetic::Platform.logger.warn "Running #{template.script} in the #{template.name}:#{template.version} repository."
               Kinetic::Platform.logger.warn "  #{template.script_path}"
               script_variables = script_data({
-                "bridgehub" => @bridgehub.template_bindings,
+                "agent" => @agent.template_bindings,
                 "core" => @core.template_bindings,
                 "discussions" => @discussions.template_bindings,
-                "filehub" => @filehub.template_bindings,
                 "task" => @task.template_bindings
               }, template.script_args)
               system("ruby", template.script_path, script_variables.to_json)
@@ -44,10 +43,10 @@ module Kinetic
 
         elsif res.status == 404
           msg = "Aborting #{ACTION}, the space with slug #{@core.space_slug} doesn't exist."
-          Kinetic::Platform.logger.info msg
+          Kinetic::Platform.logger.warn msg
         else
           msg = "#{res.status}: Aborting  #{ACTION} of space #{@core.space_slug}, #{res.message}"
-          Kinetic::Platform.logger.info msg
+          Kinetic::Platform.logger.warn msg
         end
 
 

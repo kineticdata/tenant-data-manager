@@ -19,21 +19,17 @@ module Kinetic
         res = http.post(url, payload, http.default_headers)
 
         # 2 - remove the bridge
-        Kinetic::Platform.logger.info "Deleting the bridge for space #{@bridgehub.space_slug}"
-        http = Http.new(@bridgehub.username, @bridgehub.password, @http_options)
-        url = "#{@bridgehub.api}/bridges/#{@bridgehub.bridge_slug}"
+        Kinetic::Platform.logger.info "Deleting the bridge for space #{@core.space_slug}"
+        http = Http.new(@core.username, @core.password, @http_options)
+        url = "#{@agent.server}/app/api/v1/spaces/#{@agent.space_slug}/bridges/#{@agent.bridge_slug}"
+        Kinetic::Platform.logger.info "  DELETE #{url}"
         res = http.delete(url, http.default_headers)
 
-        # 3 - remove the filestore
-        Kinetic::Platform.logger.info "Deleting the filestore for space #{@filehub.space_slug}"
-        http = Http.new(@filehub.username, @filehub.password, @http_options)
-        url = "#{@filehub.api}/filestores/#{@filehub.filestore_slug}"
-        res = http.delete(url, http.default_headers)
-
-        # 4 - remove the space
+        # 3 - remove the space
         Kinetic::Platform.logger.info "Deleting the space #{@core.space_slug}"
         http = Http.new(@core.username, @core.password, @http_options)
         url = "#{@core.system_api}/spaces/#{@core.space_slug}"
+        Kinetic::Platform.logger.info "  DELETE #{url}"
         http.delete(url, http.default_headers)
 
 

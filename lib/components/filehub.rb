@@ -2,7 +2,7 @@ module Kinetic
   module Platform
     class Filehub
 
-      attr_reader :host, :username, :password,
+      attr_reader :host, :username, :password, :component_type,
                   :adapter_class, :adapter_properties
 
       attr_accessor :space_slug, :access_key_id, :access_key_secret
@@ -13,6 +13,8 @@ module Kinetic
         @space_slug = options["space_slug"]
         @username = options["username"] || "admin"
         @password = options["password"] || "admin"
+
+        @component_type = "filehub"
 
         @access_key_id, @access_key_secret = nil, nil
 
@@ -29,6 +31,10 @@ module Kinetic
         "#{server}/app/api/v1"
       end
 
+      def proxy_api
+        "#{@component_type}/app/api/v1"
+      end
+
       def filestore_slug
         "#{@space_slug}"
       end
@@ -40,6 +46,7 @@ module Kinetic
       def template_bindings
         {
           "api" => api,
+          "proxy_api" => proxy_api,
           "server" => server,
           "space_slug" => @space_slug,
           "filestores" => {

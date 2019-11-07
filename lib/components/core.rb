@@ -44,15 +44,30 @@ module Kinetic
         "#{server}/app/components"
       end
 
+      def agent_api
+        "#{proxy_url}/agent/app/api/v1"
+      end
+
+      def task_api_v1
+        "#{proxy_url}/task/app/api/v1"
+      end
+
+      def task_api_v2
+        "#{proxy_url}/task/app/api/v2"
+      end
+
       def template_bindings
         {
-          "api" => api,
-          "proxy_url" => proxy_url,
-          "server" => server,
+          "api" => api(),
+          "agent_api" => agent_api(),
+          "proxy_url" => proxy_url(),
+          "server" => server(),
           "space_slug" => @space_slug,
           "space_name" => @space_name,
           "service_user_username" => @service_user_username,
-          "service_user_password" => @service_user_password
+          "service_user_password" => @service_user_password,
+          "task_api_v1" => task_api_v1(),
+          "task_api_v2" => task_api_v2()
         }
       end
 

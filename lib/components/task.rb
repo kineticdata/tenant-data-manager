@@ -2,13 +2,15 @@ module Kinetic
   module Platform
     class Task
     
-      attr_reader :host, :subdomains, :username, :password_key, :license, :provisioner_username, :provisioner_password
+      attr_reader :host, :subdomains, :username, :password_key, :component_type,
+                  :license, :provisioner_username, :provisioner_password
 
       attr_accessor :space_slug, :image, :tag, :password,
-                    :service_user_username, :service_user_password
+                    :service_user_username, :service_user_password,
+                    :signature_secret
 
       CONFIGURATOR_USERNAME = "admin"
-      CONFIGURATOR_PASSWORD_KEY = "KINETIC_TASK_CONFIGURATOR_PASSWORD"
+      CONFIGURATOR_PASSWORD_KEY = "CONFIGURATOR_PASSWORD"
 
       def initialize(options)
         @host = options["host"]
@@ -21,13 +23,15 @@ module Kinetic
         @provisioner_username = ENV['TENANT-INFRASTRUCTURE-USERNAME']
         @provisioner_password = ENV['TENANT-INFRASTRUCTURE-PASSWORD']
 
+        @component_type = "task"
+
         container = options["container"] || {}
         @image = container["image"]
         @tag = container["tag"]
 
         @password = nil
-        @service_user_username = nil
-        @service_user_password = nil
+        @service_user_username, @service_user_password = nil, nil
+        @signature_secret = nil
       end
 
       def server
@@ -54,14 +58,12 @@ module Kinetic
         {
           "api" => api,
           "api_v2" => api_v2,
+          "component_type" => @component_type,
           "server" => server,
           "space_slug" => @space_slug,
-          "username" => @username,
-          "password" => @password,
           "service_user_username" => @service_user_username,
           "service_user_password" => @service_user_password,
-          "provisioner_username" => @provisioner_username,
-          "provisioner_password" => @provisioner_password
+          "signature_secret" => @signature_secret
         }
       end
 
