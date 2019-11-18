@@ -10,7 +10,7 @@ module Kinetic
                     :signature_secret
 
       CONFIGURATOR_USERNAME = "admin"
-      CONFIGURATOR_PASSWORD_KEY = "CONFIGURATOR_PASSWORD"
+      CONFIGURATOR_PASSWORD_KEY = "CONFIGURATOR_PASSWORD_PLAINTEXT"
 
       def initialize(options)
         @host = options["host"]
@@ -20,8 +20,8 @@ module Kinetic
         @password_key = CONFIGURATOR_PASSWORD_KEY
         @license = options["license"]
         
-        @provisioner_username = ENV['TENANT-INFRASTRUCTURE-USERNAME']
-        @provisioner_password = ENV['TENANT-INFRASTRUCTURE-PASSWORD']
+        @provisioner_username = ENV['BASIC_AUTH_USERNAME']
+        @provisioner_password = ENV['BASIC_AUTH_PASSWORD']
 
         @component_type = "task"
 

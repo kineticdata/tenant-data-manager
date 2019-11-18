@@ -94,6 +94,9 @@ module Kinetic
         service_user_username = "integration-user"
         service_user_password = Kinetic::Platform::Kubernetes.decode_space_secret(@core.space_slug, @core.service_user_password_key)
 
+        # TODO: REMOVE PRINT
+        Kinetic::Platform.logger.info "Integration User Password: #{service_user_password}"
+
         # update the credentials in each application that utilizes the service user
         @agent.service_user_username = service_user_username
         @agent.service_user_password = service_user_password
@@ -156,6 +159,10 @@ module Kinetic
         # configure the task platform component
         Kinetic::Platform.logger.info "Configuring the #{@core.space_name} task platform component"
         @task.signature_secret = Kinetic::Platform::Random.simple(32)
+
+        # TODO: REMOVE PRINT
+        Kinetic::Platform.logger.info "Signature Authenticator Secret: #{@task.signature_secret}"
+        
         http = Http.new(service_user_username, service_user_password, @http_options)
         payload = {
           "platformComponents" => {
@@ -196,6 +203,10 @@ module Kinetic
             if @task.password.nil?
               Kinetic::Platform.logger.warn "WARNING - Invalid task configurator user credentials - #{@task.username}:#{@task.password}"
             end
+
+            # TODO: REMOVE PRINT
+            Kinetic::Platform.logger.info "Task Configurator Password: #{@task.password}"
+            
             # add the task license
             if !@task.license.nil?
               Kinetic::Platform.logger.info "Importing the #{@core.space_name} task license"
