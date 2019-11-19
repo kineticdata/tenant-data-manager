@@ -156,6 +156,7 @@ module Kinetic
         # configure the task platform component
         Kinetic::Platform.logger.info "Configuring the #{@core.space_name} task platform component"
         @task.signature_secret = Kinetic::Platform::Random.simple(32)
+
         http = Http.new(service_user_username, service_user_password, @http_options)
         payload = {
           "platformComponents" => {
@@ -196,6 +197,7 @@ module Kinetic
             if @task.password.nil?
               Kinetic::Platform.logger.warn "WARNING - Invalid task configurator user credentials - #{@task.username}:#{@task.password}"
             end
+
             # add the task license
             if !@task.license.nil?
               Kinetic::Platform.logger.info "Importing the #{@core.space_name} task license"
