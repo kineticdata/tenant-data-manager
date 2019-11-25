@@ -5,9 +5,7 @@ module Kinetic
       attr_reader :host, :subdomains, :username, :password_key, :component_type,
                   :license, :provisioner_username, :provisioner_password
 
-      attr_accessor :space_slug, :image, :tag, :password,
-                    :service_user_username, :service_user_password,
-                    :signature_secret
+      attr_accessor :space_slug, :image, :tag, :password, :signature_secret
 
       CONFIGURATOR_USERNAME = "admin"
       CONFIGURATOR_PASSWORD_KEY = "CONFIGURATOR_PASSWORD_PLAINTEXT"
@@ -30,7 +28,6 @@ module Kinetic
         @tag = container["tag"]
 
         @password = nil
-        @service_user_username, @service_user_password = nil, nil
         @signature_secret = nil
       end
 
@@ -61,8 +58,6 @@ module Kinetic
           "component_type" => @component_type,
           "server" => server,
           "space_slug" => @space_slug,
-          "service_user_username" => @service_user_username,
-          "service_user_password" => @service_user_password,
           "signature_secret" => @signature_secret
         }
       end

@@ -5,8 +5,8 @@ require 'sinatra'
 # set :port, 4567
 
 APP = "Kinetic Platform Tenant Data Manager"
-VERSION = "0.1.0"
-RELEASE_DATE = "2019-05-15"
+VERSION = "0.1.1"
+RELEASE_DATE = "2019-11-22"
 
 class Application < Sinatra::Base
 
@@ -73,11 +73,18 @@ class Application < Sinatra::Base
   # execute the provisioner action and return the json data to respond with
   def execute_post(provisioner)
     logger.info("Request to #{provisioner.action} #{provisioner.slug}")
-    results = provisioner.execute
+
+    # run the provision action in a separate thread so the initial request
+    # doesn't have to wait for the entire provisioner action
+    Thread.new do
+      results = provisioner.execute
+      provisioner.callback(results)
+    end
+
+    # return the initial results
     {
       :action => provisioner.action,
-      :space_slug => provisioner.slug,
-      :results => results
+      :space_slug => provisioner.slug
     }.to_json
   end
 end

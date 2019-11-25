@@ -20,7 +20,7 @@ module Kinetic
         space = options["space"] || {}
         @space_name = space["name"] || @space_slug
 
-        @service_user_username = nil
+        @service_user_username = options["service_user_username"]
         @service_user_password = nil
       end
 

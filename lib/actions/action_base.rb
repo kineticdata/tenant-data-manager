@@ -4,7 +4,7 @@ module Kinetic
 
       require 'deep_merge'
 
-      attr_reader :action, :slug, :templates,
+      attr_reader :action, :slug, :templates, :callback,
                   :agent, :core, :discussions, :task,
                   :http_options, :internal_http_options, :template_data
 
@@ -43,6 +43,7 @@ module Kinetic
           @subdomains = options["subdomains"].nil? ? true : 
               options["subdomains"].to_s.strip.downcase == "true"
           @host = options["host"]
+          @callback = options["callback"] || {}
           @component_metadata = options["components"] || {}
           @template_metadata = options["templates"] || []
 
@@ -78,12 +79,81 @@ module Kinetic
         raise StandardError.new "Not Implemented"
       end
 
+      def callback(results)
+        if @callback['token']
+          complete_deferred_task(results)
+        else
+          update_manage_space(results)
+        end
+      end
+
       def duration(start, finish=Time.now)
         "%.3f sec" % (finish-start)
       end
 
 
       private
+
+      ###############################################
+      # callback methods
+      ###############################################
+
+      def complete_deferred_task(results)
+        message = results["message"]
+        status = results["status"]
+
+        token = @callback['token']
+        url = @callback['url']
+        if !token.nil? && !url.nil?
+          Kinetic::Platform.logger.info "Completing the deferral token #{token} at #{url}"
+          http = Http.new(@core.service_user_username, manage_space_password(), @http_options)
+          results_xml = %|
+            <results>
+              <result name="message">#{escape_xml(message)}</result>
+              <result name="status">#{escape_xml(status)}</result>
+            </results>
+          |
+          payload = { "token" => token, "message" => message, "results" => results_xml }
+          res = http.post(url, payload, http.default_headers)
+          if res.status != 200
+            msg = "POST #{url} - #{res.status}: #{res.message}"
+            Kinetic::Platform.logger.error msg
+            return
+          end
+        end
+      end
+
+      def update_manage_space(results)
+        value = results["value"]
+
+        attribute = @callback['attribute']
+        if !attribute.nil?
+          Kinetic::Platform.logger.info "Updating the #{attribute} attribute in the manage space"
+          http = Http.new(@core.service_user_username, manage_space_password(), @http_options)
+          url = "#{@core.api}/space"
+          payload = { "attributesMap" => { attribute => value } }
+          res = http.put(url, payload, http.default_headers)
+          if res.status != 200
+            msg = "PUT #{url} - #{res.status}: #{res.message}"
+            Kinetic::Platform.logger.error msg
+            return
+          end
+        end
+      end
+
+      def manage_space_password
+        Kinetic::Platform::Kubernetes.decode_space_secret("manage", "INTEGRATION_USER_PASSWORD")
+      end
+
+      def escape_xml(string)
+        escape_map = {'&'=>'&amp;', '>'=>'&gt;', '<'=>'&lt;', '"' => '&quot;'}
+        string.to_s.gsub(/[&"><]/) { |special| escape_map[special] } if string
+      end
+
+
+      ###############################################
+      # validation methods
+      ###############################################
 
       def validate
         validate_action
@@ -119,7 +189,8 @@ module Kinetic
           "space_slug" => @slug,
           "subdomains" => @subdomains,
           "username" => Kinetic::Platform::Kubernetes.decode_secret("shared-secrets", "system_username"),
-          "password" => Kinetic::Platform::Kubernetes.decode_secret("shared-secrets", "system_password")
+          "password" => Kinetic::Platform::Kubernetes.decode_secret("shared-secrets", "system_password"),
+          "service_user_username" => "integration-user"
         }
 
         # Create the components if they were defined in the passed in data

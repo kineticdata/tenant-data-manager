@@ -51,6 +51,10 @@ The following properties may be provided to the tenant data manager when install
 * slug -       **my-space**                 # the space slug to create
 * host -       **https://kinops-test.io**   # the URL of the core server
 * subdomains - **false**                    # Optional flag to disable subdomains for tenant spaces
+* callback                                  # Optional callback configuration hash
+  * attribute                               # FOR MANAGEMENT SPACE ONLY - attribute name to clear
+  * token                                   # FOR TENANT SPACE ONLY - deferred task token
+  * url                                     # FOR TENANT SPACE ONLY - URL to complete the deferred task
 * http_options                              # Optional HTTP configuration hash
   * log_level -  **info**                   # Optional log level passed to template scripts
   * log_output - **STDERR**                 # Optional log output location passed to template scripts
@@ -92,6 +96,10 @@ curl -X POST \
   -d '{
     "slug": "my-space",
     "host": "https://kinops-test.io",
+    "callback": {
+      "token": "random_token_value",
+      "url": "https://manage.kinops-test.io/app/components/task/app/api/v1/complete-deferred-task/Kinetic%20Core"
+    },
     "http_options": {
       "log_level": "info",
       "log_output": "STDERR",
@@ -133,6 +141,9 @@ The following properties must be provided to the tenant data manager when decomm
 
 * slug -       **my-space**                 # the space slug to decommission
 * host -       **https://kinops-test.io**   # the URL of the core server
+* callback                                  # Optional callback configuration hash
+  * token                                   # FOR TENANT SPACE ONLY - deferred task token
+  * url                                     # FOR TENANT SPACE ONLY - URL to complete the deferred task
 * http_options                              # Optional HTTP configuration hash
   * log_level -  **info**                   # Optional log level passed to template scripts
   * log_output - **STDERR**                 # Optional log output location passed to template scripts
@@ -151,7 +162,11 @@ curl -X POST \
   -H 'Content-Type: application/json' \
   -d '{
     "slug": "my-space",
-    "host": "https://kinops-test.io"
+    "host": "https://kinops-test.io",
+    "callback": {
+      "token": "random_token_value",
+      "url": "https://manage.kinops-test.io/app/components/task/app/api/v1/complete-deferred-task/Kinetic%20Core"
+    }
   }'
 ```
 
@@ -161,6 +176,9 @@ The following properties must be provided to the tenant data manager when uninst
 
 * slug -       **my-space**                 # the space slug to uninstall
 * host -       **https://kinops-test.io**   # the URL of the core server
+* callback                                  # Optional callback configuration hash
+  * token                                   # FOR TENANT SPACE ONLY - deferred task token
+  * url                                     # FOR TENANT SPACE ONLY - URL to complete the deferred task
 * http_options                              # Optional HTTP configuration hash
   * log_level -  **info**                   # Optional log level passed to template scripts
   * log_output - **STDERR**                 # Optional log output location passed to template scripts
@@ -179,6 +197,10 @@ curl -X POST \
   -H 'Content-Type: application/json' \
   -d '{
     "slug": "my-space",
-    "host": "https://kinops-test.io"
+    "host": "https://kinops-test.io",
+    "callback": {
+      "token": "random_token_value",
+      "url": "https://manage.kinops-test.io/app/components/task/app/api/v1/complete-deferred-task/Kinetic%20Core"
+    }
   }'
 ```

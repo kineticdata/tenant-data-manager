@@ -14,7 +14,8 @@ module Kinetic
 
         @component_type = "bridgehub"
 
-        @service_user_username, @service_user_password = nil, nil
+        @service_user_username = options["service_user_username"]
+        @service_user_password = nil
       end
 
       def server

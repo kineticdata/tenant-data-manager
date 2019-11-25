@@ -3,7 +3,7 @@ module Kinetic
     class Agent
 
       attr_reader :host, :username, :password, :component_type
-      attr_accessor :space_slug, :service_user_username, :service_user_password
+      attr_accessor :space_slug
       
       def initialize(options)
         @host = options["host"]
@@ -13,8 +13,6 @@ module Kinetic
         @password = options["password"] || "admin"
 
         @component_type = "agent"
-
-        @service_user_username, @service_user_password = nil, nil
       end
 
       def server
@@ -44,8 +42,6 @@ module Kinetic
           "bridge_path" => bridge_path,
           "bridge_slug" => bridge_slug,
           "filestore_api" => filestore_api,
-          "service_user_username" => @service_user_username,
-          "service_user_password" => @service_user_password,
           "space_slug" => @space_slug
         }
       end
