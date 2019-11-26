@@ -80,9 +80,9 @@ module Kinetic
       end
 
       def callback(results)
-        if @callback['token']
+        if @callback['url']
           complete_deferred_task(results)
-        else
+        elsif @callback['attribute']
           update_manage_space(results)
         end
       end
@@ -102,10 +102,9 @@ module Kinetic
         message = results["message"]
         status = results["status"]
 
-        token = @callback['token']
         url = @callback['url']
-        if !token.nil? && !url.nil?
-          Kinetic::Platform.logger.info "Completing the deferral token #{token} at #{url}"
+        if url
+          Kinetic::Platform.logger.info "Completing the deferred task at #{url}"
           http = Http.new(@core.service_user_username, manage_space_password(), @http_options)
           results_xml = %|
             <results>
@@ -113,7 +112,7 @@ module Kinetic
               <result name="status">#{escape_xml(status)}</result>
             </results>
           |
-          payload = { "token" => token, "message" => message, "results" => results_xml }
+          payload = { "message" => message, "results" => results_xml, "token" => @callback['token'] }
           res = http.post(url, payload, http.default_headers)
           if res.status != 200
             msg = "POST #{url} - #{res.status}: #{res.message}"
@@ -124,10 +123,10 @@ module Kinetic
       end
 
       def update_manage_space(results)
-        value = results["value"]
-
         attribute = @callback['attribute']
-        if !attribute.nil?
+        value = results["value"]
+        
+        if attribute
           Kinetic::Platform.logger.info "Updating the #{attribute} attribute in the manage space"
           http = Http.new(@core.service_user_username, manage_space_password(), @http_options)
           url = "#{@core.api}/space"

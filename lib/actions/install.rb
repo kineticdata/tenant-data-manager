@@ -277,19 +277,23 @@ module Kinetic
 
           message = "#{ACTION} space #{@core.space_slug} complete"
           status = "Complete"
+          value = "Completed Successfully"
         rescue Exception => e
           message = e.message
           status = "Failed"
+          value = "Failed: #{message}"
         ensure
           duration = duration(timing_start)
           message += " (#{duration})"
+          value += " (#{duration})"
           Kinetic::Platform.logger.info message
         end
         
         # return the results
         {
           "message" => message,
-          "status" => status
+          "status" => status,
+          "value" => value
         }
       end
       
