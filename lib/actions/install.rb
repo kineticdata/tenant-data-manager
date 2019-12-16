@@ -144,8 +144,8 @@ module Kinetic
           Kinetic::Platform.logger.info "  POST #{url}"
           res = http.post(url, payload, http.default_headers)
           if res.status != 200
-            Kinetic::Platform.logger.warn "POST #{url} - #{res.status}: #{res.message}"
-            raise StandardError.new(msg)
+            msg = "POST #{url} - #{res.status}: #{res.message}"
+            Kinetic::Platform.logger.warn msg
           end
 
           # configure the task platform component

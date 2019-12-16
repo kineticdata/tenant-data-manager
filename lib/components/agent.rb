@@ -2,12 +2,13 @@ module Kinetic
   module Platform
     class Agent
 
-      attr_reader :host, :username, :password, :component_type
+      attr_reader :agent_slug, :host, :username, :password, :component_type
       attr_accessor :space_slug
       
       def initialize(options)
         @host = options["host"]
         @subdomains = options["subdomains"]
+        @agent_slug = options["agent_slug"] || "system"
         @space_slug = options["space_slug"]
         @username = options["username"] || "admin"
         @password = options["password"] || "admin"
@@ -37,6 +38,7 @@ module Kinetic
 
       def template_bindings
         {
+          "agent_slug" => @agent_slug,
           "component_type" => @component_type,
           "bridge_api" => bridge_api,
           "bridge_path" => bridge_path,
