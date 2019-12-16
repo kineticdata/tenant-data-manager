@@ -70,6 +70,9 @@ module Kinetic
 
           # validate the arguments
           validate
+
+          Kinetic::Platform.logger.info("Task Server: #{@task.server}")
+          Kinetic::Platform.logger.info("Argument Options: #{options}")
         rescue Exception => e
           raise e
         end
