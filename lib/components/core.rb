@@ -45,7 +45,7 @@ module Kinetic
       end
 
       def agent_api(agent_slug="system")
-        "#{proxy_url}/agent/#{agent_slug}/app/api/v1"
+        "#{proxy_url}/agents/#{agent_slug}/app/api/v1"
       end
 
       def task_api_v1
