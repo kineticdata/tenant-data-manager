@@ -161,6 +161,7 @@ module Kinetic
               }
             }
           }
+          Kinetic::Platform.logger.info "Task Platform Component Payload: #{payload}"
           url = "#{@core.api}/space"
           res = http.put(url, payload, http.default_headers)
 
