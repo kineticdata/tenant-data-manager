@@ -133,7 +133,7 @@ module Kinetic
           Kinetic::Platform.logger.info "Updating the #{attribute} attribute in the manage space"
           http = Http.new(@core.service_user_username, manage_space_password(), @http_options)
           url = "#{@core.api}/space"
-          payload = { "attributesMap" => { attribute => value } }
+          payload = { "attributesMap" => { attribute => [value] } }
           res = http.put(url, payload, http.default_headers)
           if res.status != 200
             msg = "PUT #{url} - #{res.status}: #{res.message}"
