@@ -6,6 +6,16 @@ The tenant data manager is currently running as a web application with a REST AP
 
 The service runs on TCP port 4567.
 
+## Running
+
+```sh
+docker run --rm \
+  -p 4567:4567 \
+  --env BASIC_AUTH_USERNAME=admin \
+  --env BASIC_AUTH_PASSWORD=admin \
+  kineticdata/tenant-data-manager:5.0.0
+```
+
 ## Health
 
 Responds with a `running` status if the service is running.

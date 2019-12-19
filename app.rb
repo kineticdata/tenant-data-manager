@@ -4,9 +4,7 @@ require 'sinatra'
 # set :bind, '0.0.0.0'
 # set :port, 4567
 
-APP = "Kinetic Platform Tenant Data Manager"
-VERSION = "0.1.1"
-RELEASE_DATE = "2019-11-22"
+VERSION = File.new(File.join(__dir__, "version.rb")).read.chomp
 
 class Application < Sinatra::Base
 
@@ -64,9 +62,8 @@ class Application < Sinatra::Base
 
   get '/version' do
     { 
-      :application => APP,
-      :version => VERSION,
-      :release_date => RELEASE_DATE
+      :application => "Kinetic Platform Tenant Data Manager",
+      :version => VERSION
     }.to_json
   end
 
