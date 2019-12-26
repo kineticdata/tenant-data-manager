@@ -144,7 +144,8 @@ module Kinetic
       end
 
       def manage_space_password
-        Kinetic::Platform::Kubernetes.decode_space_secret("manage", "INTEGRATION_USER_PASSWORD")
+        manage_slug = ENV["MANAGE_SPACE_SLUG"] || "manage"
+        Kinetic::Platform::Kubernetes.decode_space_secret(manage_slug, "INTEGRATION_USER_PASSWORD")
       end
 
       def escape_xml(string)
