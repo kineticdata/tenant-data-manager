@@ -156,6 +156,9 @@ module Kinetic
           payload = {
             "platformComponents" => {
               "task" => {
+                "config" => {
+                  "platformSourceName" => "Kinetic Request CE",
+                },
                 "secret" => @task.signature_secret,
                 "url" => @task.server
               }
