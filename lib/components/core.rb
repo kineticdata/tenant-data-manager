@@ -21,7 +21,7 @@ module Kinetic
         @space_name = space["name"] || @space_slug
 
         @service_user_username = options["service_user_username"]
-        @service_user_password = nil
+        @service_user_password = options["service_user_password"]
       end
 
       def server

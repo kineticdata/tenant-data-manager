@@ -22,35 +22,41 @@ class Application < Sinatra::Base
 
   # POST routes - provision actions
 
-  post '/install' do
+  post '/gravity-install' do
     data = JSON.parse(request.body.read)
-    data["action"] = "install"
-    execute_post(Kinetic::Platform::Install.new(data))
+    data["action"] = "gravity_install"
+    execute_post(Kinetic::Platform::GravityInstall.new(data))
   end
 
-  post '/repair' do
-    data = JSON.parse(request.body.read)
-    data["action"] = "repair"
-    execute_post(Kinetic::Platform::Repair.new(data))
-  end
+  # post '/install' do
+  #   data = JSON.parse(request.body.read)
+  #   data["action"] = "install"
+  #   execute_post(Kinetic::Platform::Install.new(data))
+  # end
 
-  post '/upgrade' do
-    data = JSON.parse(request.body.read)
-    data["action"] = "upgrade"
-    execute_post(Kinetic::Platform::Upgrade.new(data))
-  end
+  # post '/repair' do
+  #   data = JSON.parse(request.body.read)
+  #   data["action"] = "repair"
+  #   execute_post(Kinetic::Platform::Repair.new(data))
+  # end
 
-  post '/decommission' do
-    data = JSON.parse(request.body.read)
-    data["action"] = "decommission"
-    execute_post(Kinetic::Platform::Decommission.new(data))
-  end
+  # post '/upgrade' do
+  #   data = JSON.parse(request.body.read)
+  #   data["action"] = "upgrade"
+  #   execute_post(Kinetic::Platform::Upgrade.new(data))
+  # end
 
-  post '/uninstall' do
-    data = JSON.parse(request.body.read)
-    data["action"] = "uninstall"
-    execute_post(Kinetic::Platform::Uninstall.new(data))
-  end
+  # post '/decommission' do
+  #   data = JSON.parse(request.body.read)
+  #   data["action"] = "decommission"
+  #   execute_post(Kinetic::Platform::Decommission.new(data))
+  # end
+
+  # post '/uninstall' do
+  #   data = JSON.parse(request.body.read)
+  #   data["action"] = "uninstall"
+  #   execute_post(Kinetic::Platform::Uninstall.new(data))
+  # end
 
   # GET routes - health / version
 
