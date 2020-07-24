@@ -13,5 +13,11 @@ RUN bundle install
 
 EXPOSE 4567
 
+RUN adduser -D -h /home/kineticdata -u 55101 kineticdata kineticdata && \
+  chown -R kineticdata:kineticdata /app && \
+  chmod g+s /app
+
+USER kineticdata
+
 ENTRYPOINT ["puma"]
 CMD ["config.ru", "-C", "puma.rb"]
