@@ -8,8 +8,20 @@ VERSION = File.new(File.join(__dir__, "version.rb")).read.chomp
 
 class Application < Sinatra::Base
 
-  use Rack::Auth::Basic, "Authentication Required" do |username, password|
-    username == ENV['BASIC_AUTH_USERNAME'] and password == ENV['BASIC_AUTH_PASSWORD']
+  helpers do
+    def protected!
+      return if authorized?
+      headers['WWW-Authenticate'] = 'Basic realm="Restricted Area"'
+      halt 401, "Authentication Required\n"
+    end
+
+    def authorized?
+      @auth ||=  Rack::Auth::Basic::Request.new(request.env)
+      @auth.provided? and 
+        @auth.basic? and 
+        @auth.credentials and 
+        @auth.credentials == [ENV['BASIC_AUTH_USERNAME'], ENV['BASIC_AUTH_PASSWORD']]
+    end
   end
 
   before do
@@ -17,42 +29,48 @@ class Application < Sinatra::Base
   end
 
   not_found do
-    "Not Found"
+    "Not Found\n"
   end
 
   # POST routes - provision actions
 
   post '/gravity-install' do
+    protected!
     data = JSON.parse(request.body.read)
     data["action"] = "gravity_install"
     execute_post(Kinetic::Platform::GravityInstall.new(data))
   end
 
   post '/install' do
+    protected!
     data = JSON.parse(request.body.read)
     data["action"] = "install"
     execute_post(Kinetic::Platform::Install.new(data))
   end
 
   post '/repair' do
+    protected!
     data = JSON.parse(request.body.read)
     data["action"] = "repair"
     execute_post(Kinetic::Platform::Repair.new(data))
   end
 
   post '/upgrade' do
+    protected!
     data = JSON.parse(request.body.read)
     data["action"] = "upgrade"
     execute_post(Kinetic::Platform::Upgrade.new(data))
   end
 
   post '/decommission' do
+    protected!
     data = JSON.parse(request.body.read)
     data["action"] = "decommission"
     execute_post(Kinetic::Platform::Decommission.new(data))
   end
 
   post '/uninstall' do
+    protected!
     data = JSON.parse(request.body.read)
     data["action"] = "uninstall"
     execute_post(Kinetic::Platform::Uninstall.new(data))
@@ -62,14 +80,14 @@ class Application < Sinatra::Base
 
   get '/' do
     {
-      :status => "Running"
+      :status => "Running\n"
     }.to_json
   end
 
   get '/version' do
     { 
-      :application => "Kinetic Platform Tenant Data Manager",
-      :version => VERSION
+      :application => "Kinetic Platform Tenant Data Manager\n",
+      :version => "#{VERSION}\n"
     }.to_json
   end
 
