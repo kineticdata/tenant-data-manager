@@ -15,7 +15,9 @@ EXPOSE 4567
 
 RUN adduser -D -h /home/kineticdata -u 55101 kineticdata kineticdata && \
   chown -R kineticdata:kineticdata /app && \
-  chmod g+s /app
+  chmod g+s /app && \
+  chown -R kineticdata:kineticdata /usr/local/bundle && \
+  chmod g+s /usr/local/bundle
 
 USER kineticdata
 
