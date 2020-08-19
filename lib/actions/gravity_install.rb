@@ -19,6 +19,7 @@ module Kinetic
           @slug = options["slug"]
           @subdomains = true
           @host = options["host"]
+          @space = options["space"] || {}
           @callback = options["callback"] || {}
           @component_metadata = options["components"] || {}
           @template_metadata = options["templates"] || []
@@ -108,6 +109,7 @@ module Kinetic
 
       def callback(results)
         update_space(results) if @callback['status']
+        complete_deferred_task(results) if @callback['url']
       end
 
       def duration(start, finish=Time.now)
@@ -154,6 +156,36 @@ module Kinetic
         end
       end
 
+      def complete_deferred_task(results)
+        message = results["message"]
+        status = results["status"]
+
+        url = @callback['url']
+        if url
+          Kinetic::Platform.logger.info "Completing the deferred task at #{url}"
+          http = Http.new(@core.service_user_username, manage_space_password(), @http_options)
+          results_xml = %|
+            <results>
+              <result name="message">#{escape_xml(message)}</result>
+              <result name="status">#{escape_xml(status)}</result>
+            </results>
+          |
+          payload = { "message" => message, "results" => results_xml }
+          res = http.post(url, payload, http.default_headers)
+          if res.status != 200
+            msg = "POST #{url} - #{res.status}: #{res.message}"
+            Kinetic::Platform.logger.error msg
+            return
+          end
+        end
+      end
+
+      def escape_xml(string)
+        escape_map = {'&'=>'&amp;', '>'=>'&gt;', '<'=>'&lt;', '"' => '&quot;'}
+        string.to_s.gsub(/[&"><]/) { |special| escape_map[special] } if string
+      end
+
+
       ###############################################
       # validation methods
       ###############################################
@@ -169,6 +201,11 @@ module Kinetic
       def validate_action
         raise "`action` must be one of: #{ACTIONS.join(',')}." unless 
           ACTIONS.include?(@action)
+      end
+
+      def manage_space_password
+        manage_slug = ENV["MANAGE_SPACE_SLUG"] || "manage"
+        Kinetic::Platform::Kubernetes.decode_space_secret(manage_slug, "INTEGRATION_USER_PASSWORD")
       end
 
       def validate_slug
@@ -194,7 +231,8 @@ module Kinetic
           "username" => Kinetic::Platform::Kubernetes.decode_secret("shared-secrets", "system_username"),
           "password" => Kinetic::Platform::Kubernetes.decode_secret("shared-secrets", "system_password"),
           "service_user_username" => Kinetic::Platform::Kubernetes.decode_secret("#{@slug}-secrets", "INTEGRATION_USER_USERNAME", "kinetic-tenant-#{@slug}"),
-          "service_user_password" => Kinetic::Platform::Kubernetes.decode_secret("#{@slug}-secrets", "INTEGRATION_USER_PASSWORD", "kinetic-tenant-#{@slug}")
+          "service_user_password" => Kinetic::Platform::Kubernetes.decode_secret("#{@slug}-secrets", "INTEGRATION_USER_PASSWORD", "kinetic-tenant-#{@slug}"),
+          "space" => @space
         }
 
         # Create the components if they were defined in the passed in data
