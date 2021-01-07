@@ -66,22 +66,18 @@ module Kinetic
           subdomain_ready, tries, max_tries = false, 0, 30
           url = "#{@core.api}/version"
           loop do
-            begin
-              tries = tries + 1
-              Kinetic::Platform.logger.info "Try #{tries}, checking space subdomain at #{url}"
-              http = Http.new(nil, nil, @http_options)
-              res = http.get(url, {}, http.default_headers, { :gateway_retry_limit => -1 })
-              if res.status == 200
-                Kinetic::Platform.logger.info "  #{res.status}: space subdomain is ready"
-                subdomain_ready = true
-                break
-              end
-              Kinetic::Platform.logger.info "  #{res.status}: #{res.message}, space subdomain is not ready"
-              break if tries >= max_tries || res.status == 0
-              sleep 1
-            rescue Timeout::Error => e
-              retry if tries < max_tries
+            tries = tries + 1
+            Kinetic::Platform.logger.info "Try #{tries}, checking space subdomain at #{url}"
+            http = Http.new(nil, nil, @http_options)
+            res = http.get(url, {}, http.default_headers, { :gateway_retry_limit => -1 })
+            if res.status == 200
+              Kinetic::Platform.logger.info "  #{res.status}: space subdomain is ready"
+              subdomain_ready = true
+              break
             end
+            Kinetic::Platform.logger.info "  #{res.status}: #{res.message}, space subdomain is not ready"
+            break if tries >= max_tries || res.status == 0
+            sleep 1
           end
 
           if !subdomain_ready
