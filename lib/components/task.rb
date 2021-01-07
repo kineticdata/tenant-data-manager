@@ -12,6 +12,7 @@ module Kinetic
 
       def initialize(options)
         @host = options["host"]
+        @namespace = options["namespace"]
         @subdomains = options["subdomains"]
         @space_slug = options["space_slug"]
         @username = CONFIGURATOR_USERNAME
@@ -48,7 +49,7 @@ module Kinetic
       end
 
       def deployer_api
-        "https://tenant-infrastructure-manager.kinetic.svc.cluster.local"
+        "https://tenant-infrastructure-manager.#{@namespace}.svc.cluster.local"
       end
 
       def template_bindings

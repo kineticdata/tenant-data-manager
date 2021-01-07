@@ -9,6 +9,7 @@ module Kinetic
                   :http_options, :template_data
 
       GRAVITY_INSTALL = "gravity_install"
+      DEFAULT_NAMESPACE = "kinetic"
 
       ACTIONS = [ GRAVITY_INSTALL ]
 
@@ -17,6 +18,7 @@ module Kinetic
         begin
           @action = options["action"] || GRAVITY_INSTALL
           @slug = options["slug"]
+          @namespace = options["namespace"] || DEFAULT_NAMESPACE
           @subdomains = true
           @host = options["host"]
           @space = options["space"] || {}
@@ -226,12 +228,13 @@ module Kinetic
           
         options = { 
           "host"     => @host,
+          "namespace" => @namespace,
           "space_slug" => @slug,
           "subdomains" => @subdomains,
           "username" => Kinetic::Platform::Kubernetes.decode_secret("shared-secrets", "system_username"),
           "password" => Kinetic::Platform::Kubernetes.decode_secret("shared-secrets", "system_password"),
-          "service_user_username" => Kinetic::Platform::Kubernetes.decode_secret("#{@slug}-secrets", "INTEGRATION_USER_USERNAME", "kinetic-tenant-#{@slug}"),
-          "service_user_password" => Kinetic::Platform::Kubernetes.decode_secret("#{@slug}-secrets", "INTEGRATION_USER_PASSWORD", "kinetic-tenant-#{@slug}"),
+          "service_user_username" => Kinetic::Platform::Kubernetes.decode_secret("#{@slug}-secrets", "INTEGRATION_USER_USERNAME", "#{@namespace}-tenant-#{@slug}"),
+          "service_user_password" => Kinetic::Platform::Kubernetes.decode_secret("#{@slug}-secrets", "INTEGRATION_USER_PASSWORD", "#{@namespace}-tenant-#{@slug}"),
           "space" => @space
         }
 
