@@ -131,7 +131,7 @@ module Kinetic
             Kinetic::Platform::GravityInstall.decode_secrets(k, v, r)
           end
         else
-          memo[key] = Kinetic::Platform::Kubernetes.decode_secrets_file(value)
+          memo[key] = Kinetic::Platform::Kubernetes.decode_secrets_file(value, @namespace)
         end
         memo
       end
@@ -207,7 +207,7 @@ module Kinetic
 
       def manage_space_password
         manage_slug = ENV["MANAGE_SPACE_SLUG"] || "manage"
-        Kinetic::Platform::Kubernetes.decode_space_secret(manage_slug, "INTEGRATION_USER_PASSWORD")
+        Kinetic::Platform::Kubernetes.decode_space_secret(manage_slug, "INTEGRATION_USER_PASSWORD", @namespace)
       end
 
       def validate_slug
@@ -231,8 +231,8 @@ module Kinetic
           "namespace" => @namespace,
           "space_slug" => @slug,
           "subdomains" => @subdomains,
-          "username" => Kinetic::Platform::Kubernetes.decode_secret("shared-secrets", "system_username"),
-          "password" => Kinetic::Platform::Kubernetes.decode_secret("shared-secrets", "system_password"),
+          "username" => Kinetic::Platform::Kubernetes.decode_secret("shared-secrets", "system_username", @namespace),
+          "password" => Kinetic::Platform::Kubernetes.decode_secret("shared-secrets", "system_password", @namespace),
           "service_user_username" => Kinetic::Platform::Kubernetes.decode_secret("#{@slug}-secrets", "INTEGRATION_USER_USERNAME", "#{@namespace}-tenant-#{@slug}"),
           "service_user_password" => Kinetic::Platform::Kubernetes.decode_secret("#{@slug}-secrets", "INTEGRATION_USER_PASSWORD", "#{@namespace}-tenant-#{@slug}"),
           "space" => @space
