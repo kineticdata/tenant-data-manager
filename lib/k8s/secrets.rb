@@ -33,11 +33,11 @@ module Kinetic
       end
 
       def self.decode_space_secret(space_slug, secret_key, namespace="kinetic")
-        self.decode_secret("#{space_slug}-secrets", secret_key, "kinetic-tenant-#{space_slug}", namespace)
+        self.decode_secret("#{space_slug}-secrets", secret_key, "#{namespace}-tenant-#{space_slug}")
       end
 
-      def self.decode_space_secrets_file(space_slug, secrets_file, namespace="kinetic")
-        self.decode_secrets_file("#{space_slug}-secrets", "kinetic-tenant-#{space_slug}", namespace)
+      def self.decode_space_secrets_file(space_slug, namespace="kinetic")
+        self.decode_secrets_file("#{space_slug}-secrets", "#{namespace}-tenant-#{space_slug}")
       end
 
     end

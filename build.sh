@@ -6,7 +6,7 @@ set -e
 # Set the project name
 NAME=tenant-data-manager
 # Parse the variables
-TAG=${1:-`git rev-parse --short HEAD`}
+TAG=${1:-`git log -1 --format='%cd-%h' --date=format:%Y%m%d`}
 
 # Build the runtime containers
 docker build -f Dockerfile -t kineticdata/$NAME:$TAG .
