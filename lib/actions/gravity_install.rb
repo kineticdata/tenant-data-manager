@@ -39,7 +39,8 @@ module Kinetic
           # build the extra data to send to templates
           # add decoded template data secrets first, then merge in the rest of the
           # template data to allow overwriting values that were provided as stored secrets
-          @template_data = Kinetic::Platform::GravityInstall.prepare_template_data(options["templateData"], options["templateDataSecrets"])
+          @template_data = Kinetic::Platform::GravityInstall.prepare_template_data(
+            options["templateData"], options["templateDataSecrets"], @namespace)
 
           # validate the arguments
           validate
@@ -118,21 +119,21 @@ module Kinetic
         "%.3f sec" % (finish-start)
       end
 
-      def self.prepare_template_data(template_data, template_secret_data)
+      def self.prepare_template_data(template_data, template_secret_data, namespace)
         data = (template_secret_data || {}).each_with_object({}) do |(key,value),result|
-          Kinetic::Platform::GravityInstall.decode_secrets(key, value, result)
+          Kinetic::Platform::GravityInstall.decode_secrets(key, value, result, namespace)
         end
         data.deep_merge!(template_data || {})
       end
 
-      def self.decode_secrets(key, value, memo={})
+      def self.decode_secrets(key, value, memo, namespace)
         if value.is_a?(Hash)
           memo[key] = value.each_with_object({}) do |(k,v),r| 
-            Kinetic::Platform::GravityInstall.decode_secrets(k, v, r)
+            Kinetic::Platform::GravityInstall.decode_secrets(k, v, r, namespace)
           end
         else
-          Kinetic::Platform.logger.info("Decoding secret \"#{value}\" in the \"#{@namespace}\" namespace.")
-          memo[key] = Kinetic::Platform::Kubernetes.decode_secrets_file(value, @namespace)
+          Kinetic::Platform.logger.info("Decoding secret \"#{value}\" in the \"#{namespace}\" namespace.")
+          memo[key] = Kinetic::Platform::Kubernetes.decode_secrets_file(value, namespace)
         end
         memo
       end
