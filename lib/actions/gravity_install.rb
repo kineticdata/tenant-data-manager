@@ -66,7 +66,7 @@ module Kinetic
               Kinetic::Platform.logger.info msg
               raise StandardError.new(msg)
             else
-              msg = "The space slug #{@core.space_slug} does not exist, continuing with the template install action."
+              msg = "The space slug #{@core.space_slug} does exist, continuing with the template install action."
               Kinetic::Platform.logger.info msg
             end
           end
@@ -131,6 +131,7 @@ module Kinetic
             Kinetic::Platform::GravityInstall.decode_secrets(k, v, r)
           end
         else
+          logger.info("Decoding secret \"#{value}\" in the \"#{@namespace}\" namespace.")
           memo[key] = Kinetic::Platform::Kubernetes.decode_secrets_file(value, @namespace)
         end
         memo
