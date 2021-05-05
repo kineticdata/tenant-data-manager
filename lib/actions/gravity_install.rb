@@ -131,7 +131,7 @@ module Kinetic
             Kinetic::Platform::GravityInstall.decode_secrets(k, v, r)
           end
         else
-          logger.info("Decoding secret \"#{value}\" in the \"#{@namespace}\" namespace.")
+          Kinetic::Platform.logger.info("Decoding secret \"#{value}\" in the \"#{@namespace}\" namespace.")
           memo[key] = Kinetic::Platform::Kubernetes.decode_secrets_file(value, @namespace)
         end
         memo
