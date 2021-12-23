@@ -167,7 +167,7 @@ module Kinetic
         url = @callback['url']
         if url
           Kinetic::Platform.logger.info "Completing the deferred task at #{url}"
-          http = Http.new(@core.service_user_username, manage_space_password(), @http_options)
+          http = Http.new(manage_space_username(), manage_space_password(), @http_options)
           results_xml = %|
             <results>
               <result name="message">#{escape_xml(message)}</result>
@@ -210,6 +210,11 @@ module Kinetic
       def manage_space_password
         manage_slug = ENV["MANAGE_SPACE_SLUG"] || "manage"
         Kinetic::Platform::Kubernetes.decode_space_secret(manage_slug, "INTEGRATION_USER_PASSWORD", @namespace)
+      end
+
+      def manage_space_username
+        manage_slug = ENV["MANAGE_SPACE_SLUG"] || "manage"
+        Kinetic::Platform::Kubernetes.decode_space_secret(manage_slug, "INTEGRATION_USER_USERNAME", @namespace)
       end
 
       def validate_slug
