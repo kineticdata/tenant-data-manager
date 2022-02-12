@@ -3,11 +3,11 @@ GEM
   specs:
     deep_merge (1.2.1)
     mustermann (1.0.3)
-    nio4r (2.5.2)
-    nio4r (2.5.2-java)
-    puma (4.3.5)
+    nio4r (2.5.8)
+    nio4r (2.5.8-java)
+    puma (4.3.11)
       nio4r (~> 2.0)
-    puma (4.3.5-java)
+    puma (4.3.11-java)
       nio4r (~> 2.0)
     rack (2.2.3)
     rack-protection (2.0.5)
@@ -25,7 +25,7 @@ PLATFORMS
 
 DEPENDENCIES
   deep_merge (~> 1.2.1)
-  puma (~> 4.3.5)
+  puma (~> 4.3.11)
   sinatra (~> 2.0.5)
 
 BUNDLED WITH
