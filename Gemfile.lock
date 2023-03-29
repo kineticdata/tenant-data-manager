@@ -2,22 +2,22 @@ GEM
   remote: https://rubygems.org/
   specs:
     deep_merge (1.2.1)
-    mustermann (1.0.3)
-    nio4r (2.5.2)
-    nio4r (2.5.2-java)
-    puma (4.3.5)
+    mustermann (2.0.2)
+      ruby2_keywords (~> 0.0.1)
+    nio4r (2.5.8)
+    nio4r (2.5.8-java)
+    puma (4.3.12)
       nio4r (~> 2.0)
-    puma (4.3.5-java)
-      nio4r (~> 2.0)
-    rack (2.2.3)
-    rack-protection (2.0.5)
+    rack (2.2.6.4)
+    rack-protection (2.2.4)
       rack
-    sinatra (2.0.5)
-      mustermann (~> 1.0)
-      rack (~> 2.0)
-      rack-protection (= 2.0.5)
+    ruby2_keywords (0.0.5)
+    sinatra (2.2.4)
+      mustermann (~> 2.0)
+      rack (~> 2.2)
+      rack-protection (= 2.2.4)
       tilt (~> 2.0)
-    tilt (2.0.9)
+    tilt (2.1.0)
 
 PLATFORMS
   java
@@ -25,8 +25,8 @@ PLATFORMS
 
 DEPENDENCIES
   deep_merge (~> 1.2.1)
-  puma (~> 4.3.5)
-  sinatra (~> 2.0.5)
+  puma (~> 4.3.12)
+  sinatra (~> 2.2.3)
 
 BUNDLED WITH
-   1.16.2
+   2.4.10
