@@ -1,10 +1,11 @@
-FROM ruby:2.5-alpine
+FROM ruby:2.7-alpine
 RUN apk --no-cache add \
   alpine-sdk \
   bash \
   curl \
   git \
   openssl
+RUN gem install bundler:1.16.2
 
 COPY . /app
 
