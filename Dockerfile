@@ -5,7 +5,7 @@ RUN apk --no-cache add \
   curl \
   git \
   openssl
-RUN gem install bundler:2.4.10
+RUN gem install bundler:1.16.2
 
 COPY . /app
 
