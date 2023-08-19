@@ -4,9 +4,8 @@ GEM
     deep_merge (1.2.1)
     mustermann (2.0.2)
       ruby2_keywords (~> 0.0.1)
-    nio4r (2.5.8)
-    nio4r (2.5.8-java)
-    puma (4.3.12)
+    nio4r (2.5.9)
+    puma (5.6.7)
       nio4r (~> 2.0)
     rack (2.2.6.4)
     rack-protection (2.2.4)
@@ -24,7 +23,7 @@ PLATFORMS
 
 DEPENDENCIES
   deep_merge (~> 1.2.1)
-  puma (~> 4.3.12)
+  puma (~> 5.6.7)
   sinatra (~> 2.2.3)
 
 BUNDLED WITH
