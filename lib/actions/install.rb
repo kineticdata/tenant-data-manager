@@ -132,7 +132,7 @@ module Kinetic
           Kinetic::Platform.logger.info "Creating the #{@agent.bridge_slug} bridge"
           http = Http.new(@core.service_user_username, @core.service_user_password, @http_options)
           payload = {
-            "adapterClass" => "com.kineticdata.bridgehub.adapter.kineticcore.KineticCoreAdapter",
+            "adapterClass" => @agent.bridge_adapter_class,
             "slug" => @agent.bridge_slug,
             "properties" => {
               "Username" => @core.service_user_username,
